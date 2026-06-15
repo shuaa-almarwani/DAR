@@ -28,7 +28,12 @@ public class HomeItem {
     private LocalTime nextServiceDate;
     @Column(nullable = false)
     private String notes;
-    @Column(nullable = false)
-    private Integer homeId;
+
+
+    @ManyToOne
+    @JoinColumn(name = "homeId", nullable = false)
+    private Home home;
+
+
 
 }

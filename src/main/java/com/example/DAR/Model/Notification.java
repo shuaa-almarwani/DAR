@@ -23,4 +23,8 @@ public class Notification {
     private String type;
     @Column(nullable = false)
     private LocalDate  sentAt;
+
+        @ManyToOne
+    @JoinColumn(name = "homeId", nullable = false)
+    private Home home;
 }

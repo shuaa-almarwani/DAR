@@ -18,8 +18,6 @@ public class UserSubscription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer userId;
-    private Integer planId;
 
     @Column(nullable = false)
 
@@ -33,5 +31,15 @@ public class UserSubscription {
     @Column(nullable = false)
 
     private String paymentStatus;
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "planId", nullable = false)
+    private SubscriptionPlan subscriptionPlan;
+
 
 }

@@ -1,11 +1,13 @@
 package com.example.DAR.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +28,8 @@ public class User {
     @Column(columnDefinition = "varchar(255)",nullable = false)
     private String phoneNumber;
     private LocalDate createAt;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<UserSubscription> userSubscriptions;
 }

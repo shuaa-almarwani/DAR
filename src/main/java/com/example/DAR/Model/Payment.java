@@ -17,7 +17,6 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer userSubscriptionId;
 
     @Column(nullable = false)
     private Double amount;
@@ -29,4 +28,9 @@ public class Payment {
     private String status;
     @Column(nullable = false)
     private String transactionReference;
+
+        @ManyToOne
+    @JoinColumn(name = "userSubscriptionId", nullable = false)
+    private UserSubscription userSubscription;
+
 }

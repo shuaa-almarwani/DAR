@@ -1,10 +1,13 @@
 package com.example.DAR.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 
 @Data
@@ -39,4 +42,7 @@ public class SubscriptionPlan {
 
     private Boolean usageSpikeDetectionEnabled;
 
+@OneToMany(mappedBy = "subscriptionPlan")
+@JsonIgnore
+private Set<UserSubscription> userSubscriptions;
 }
