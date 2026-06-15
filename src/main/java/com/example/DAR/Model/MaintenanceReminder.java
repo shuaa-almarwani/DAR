@@ -17,29 +17,36 @@ public class MaintenanceReminder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String message;
 
+    @Column(nullable = false)
     private LocalDate reminderDate;
 
+    @Column(nullable = false)
     private String season;
 
+    @Column(nullable = false)
     private String weatherCondition;
 
+    @Column(nullable = false)
     private Boolean isSent;
 
+    @Column(nullable = false)
     private LocalDate createdAt;
 
 
-//    @ManyToOne
-//    @JoinColumn(name = "home_id")
-//    private Home home;
+    @ManyToOne
+    @JoinColumn(name = "home_id")
+    private Home home;
 
 
-//    @OneToOne
-//    @JoinColumn(name = "homeItem_id")
-//    private HomeItem homeItem;
+    @OneToOne
+    @JoinColumn(name = "homeItem_id")
+    private HomeItem homeItem;
 
 
 

@@ -14,22 +14,36 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(columnDefinition = "varchar(100)",nullable = false)
+
+    @Column(nullable = false)
     private String name;
-    @Column(columnDefinition = "varchar(255)",nullable = false,unique = false)
+
+    @Column(nullable = false,unique = false)
     private String email;
-    @Column(columnDefinition = "varchar(100)",nullable = false,unique = false)
+
+    @Column(nullable = false,unique = false)
     private String username;
-    @Column(columnDefinition = "varchar(255)",nullable = false)
+
+    @Column(nullable = false)
     private String password;
-    @Column(columnDefinition = "varchar(255)",nullable = false)
+
+    @Column(nullable = false)
     private String phoneNumber;
+
+    @Column(nullable = false)
     private LocalDate createAt;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private Set<UserSubscription> userSubscriptions;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Home> homes;
+
 }

@@ -1,9 +1,6 @@
 package com.example.DAR.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,29 +17,36 @@ public class Maintenance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private String description;
 
+    @Column(nullable = false)
     private LocalDate maintenanceDate;
 
+    @Column(nullable = false)
     private Double cost;
 
+    @Column(nullable = false)
     private String status;
 
+    @Column(nullable = false)
     private String priority;
 
+    @Column(nullable = false)
     private String notes;
 
 
 
-//    @ManyToOne
-//    @JoinColumn(name = "home_id")
-//    private Home home;
+    @ManyToOne
+    @JoinColumn(name = "home_id")
+    private Home home;
 
 
-//    @OneToOne
-//    @JoinColumn(name = "homeItem_id")
-//    private HomeItem homeItem;
+    @OneToOne
+    @JoinColumn(name = "homeItem_id")
+    private HomeItem homeItem;
 
 }

@@ -20,16 +20,15 @@ public class UserSubscription {
     private Integer id;
 
     @Column(nullable = false)
-
     private LocalDate startDate;
-    @Column(nullable = false)
 
+    @Column(nullable = false)
     private LocalDate endDate;
-    @Column(nullable = false)
 
+    @Column(nullable = false)
     private String status;
-    @Column(nullable = false)
 
+    @Column(nullable = false)
     private String paymentStatus;
 
 
@@ -38,7 +37,7 @@ public class UserSubscription {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "planId", nullable = false)
+    @JoinColumn(name = "plan_id", nullable = false)
     private SubscriptionPlan subscriptionPlan;
 
 

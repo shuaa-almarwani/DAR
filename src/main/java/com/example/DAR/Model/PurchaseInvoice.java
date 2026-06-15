@@ -19,24 +19,33 @@ public class PurchaseInvoice {
     private Integer id;
 
 
+    @Column(nullable = false)
     private String productName;
 
+    @Column(nullable = false)
     private String store;
 
+    @Column(nullable = false)
     private Double amount;
 
+    @Column(nullable = false)
     private LocalDate purchaseDate;
 
+    @Column(nullable = false)
     private String category;
 
+    @Column(nullable = false)
     private String imageUrl;
 
+    @Column(nullable = false)
     private String warrantyNote;
 
+    @Column(nullable = false)
     private LocalDate warrantyExpiry;
 
 
-//    @ManyToOne
-//    @JoinColumn(name = "home_id")
-//    private Home home;
+    @ManyToOne
+    @JoinColumn(name = "home_id")
+    private Home home;
+
 }

@@ -18,18 +18,22 @@ public class Sensor {
     private Integer id;
 
 
+    @Column(nullable = false)
     private String type;
 
+    @Column(nullable = false)
     private String location;
 
+    @Column(nullable = false)
     private Boolean isActive;
 
+    @Column(nullable = false)
     private LocalDate lastPing;
 
 
-//    @ManyToOne
-//    @JoinColumn(name = "home_id")
-//    private Home home;
+    @ManyToOne
+    @JoinColumn(name = "home_id")
+    private Home home;
 
 
 
