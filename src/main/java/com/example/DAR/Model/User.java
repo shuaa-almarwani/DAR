@@ -2,14 +2,13 @@ package com.example.DAR.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -37,7 +36,7 @@ public class User {
     @Column(nullable = false)
     private LocalDate createAt;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserSubscription> userSubscriptions;
 
@@ -45,5 +44,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Home> homes;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Notification> notifications;
 
 }

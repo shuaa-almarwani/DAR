@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -22,9 +23,13 @@ public class Notification {
     @Column(nullable = false)
     private String type;
     @Column(nullable = false)
-    private LocalDate  sentAt;
+    private LocalDateTime sentAt;
 
-        @ManyToOne
-    @JoinColumn(name = "home_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "home_id")
     private Home home;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

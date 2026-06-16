@@ -18,7 +18,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-
+private final NotificationService notificationService;
     public List<UserDtoOut> getAllUsers() {
 
         List<User> users = userRepository.findAll();
@@ -45,6 +45,7 @@ public class UserService {
         user.setCreateAt(LocalDate.now());
 
         userRepository.save(user);
+        notificationService.sendWelcomeNotification(user.getId());
     }
 
 
@@ -73,6 +74,7 @@ public class UserService {
         oldUser.setPhoneNumber(dto.getPhoneNumber());
 
         userRepository.save(oldUser);
+        notificationService.sendProfileUpdatedNotification(oldUser.getId());
     }
     public void deleteUser(Integer id) {
 
@@ -82,6 +84,7 @@ public class UserService {
             throw new ApiException("User not found");
         }
 
+        notificationService.sendAccountDeletedNotification(user);
         userRepository.delete(user);
     }
 
