@@ -23,10 +23,10 @@ public class Sensor {
 
     @Column(nullable = false)
     private String location;
-
+// اتوقع نقدر نخليه ديفولت
     @Column(nullable = false)
     private Boolean isActive;
-
+    // اتوقع نقدر نخليه ديفولت
     @Column(nullable = false)
     private LocalDate lastPing;
 
