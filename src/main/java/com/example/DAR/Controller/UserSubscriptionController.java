@@ -1,8 +1,7 @@
 package com.example.DAR.Controller;
 
 import com.example.DAR.Api.ApiResponse;
-import com.example.DAR.DTO.In.UserSubscriptionDtoIn;
-import com.example.DAR.Repository.UserSubscriptionRepository;
+import com.example.DAR.DTO.Out.UserSubscriptionDtoOut;
 import com.example.DAR.Service.UserSubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,7 @@ public class UserSubscriptionController {
     @PostMapping("/add/{userId}/{planId}")
     public ResponseEntity addUserSubscription(@PathVariable Integer userId,
                                               @PathVariable Integer planId,
-                                              @RequestBody @Valid UserSubscriptionDtoIn dto) {
+                                              @RequestBody @Valid UserSubscriptionDtoOut dto) {
         userSubscriptionService.addUserSubscription(userId, planId, dto);
         return ResponseEntity.status(200).body(new ApiResponse("User subscription added successfully"));
     }
@@ -32,7 +31,7 @@ public class UserSubscriptionController {
     public ResponseEntity updateUserSubscription(@PathVariable Integer subscriptionId,
                                                  @PathVariable Integer userId,
                                                  @PathVariable Integer planId,
-                                                 @RequestBody @Valid UserSubscriptionDtoIn dto) {
+                                                 @RequestBody @Valid UserSubscriptionDtoOut dto) {
         userSubscriptionService.updateUserSubscription(subscriptionId, userId, planId, dto);
         return ResponseEntity.status(200).body(new ApiResponse("User subscription updated successfully"));
     }
