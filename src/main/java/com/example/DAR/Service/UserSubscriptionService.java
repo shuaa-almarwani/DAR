@@ -1,7 +1,6 @@
 package com.example.DAR.Service;
 
 import com.example.DAR.Api.ApiException;
-import com.example.DAR.DTO.In.UserSubscriptionDtoIn;
 import com.example.DAR.DTO.Out.UserSubscriptionDtoOut;
 import com.example.DAR.Model.SubscriptionPlan;
 import com.example.DAR.Model.User;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +54,7 @@ public class UserSubscriptionService {
 
         return dto;
     }
-    public void addUserSubscription(Integer userId, Integer planId, UserSubscriptionDtoIn dto) {
+    public void addUserSubscription(Integer userId, Integer planId, UserSubscriptionDtoOut dto) {
 
         User user = userRepository.findUserById(userId);
 
@@ -72,8 +72,8 @@ public class UserSubscriptionService {
 
         userSubscription.setUser(user);
         userSubscription.setSubscriptionPlan(plan);
-        userSubscription.setStartDate(dto.getStartDate());
-        userSubscription.setEndDate(dto.getEndDate());
+        userSubscription.setStartDate(LocalDate.now());
+        userSubscription.setEndDate(LocalDate.now().plusDays(29));
 
         userSubscription.setStatus("ACTIVE");
         userSubscription.setPaymentStatus("UNPAID");
@@ -84,7 +84,7 @@ public class UserSubscriptionService {
     public void updateUserSubscription(Integer subscriptionId,
                                        Integer userId,
                                        Integer planId,
-                                       UserSubscriptionDtoIn dto) {
+                                       UserSubscriptionDtoOut dto) {
 
         UserSubscription oldSubscription =
                 userSubscriptionRepository.findUserSubscriptionById(subscriptionId);
@@ -107,8 +107,8 @@ public class UserSubscriptionService {
 
         oldSubscription.setUser(user);
         oldSubscription.setSubscriptionPlan(plan);
-        oldSubscription.setStartDate(dto.getStartDate());
-        oldSubscription.setEndDate(dto.getEndDate());
+        oldSubscription.setStartDate(LocalDate.now());
+        oldSubscription.setEndDate(LocalDate.now().plusDays(29));
 
         userSubscriptionRepository.save(oldSubscription);
     }
@@ -126,19 +126,19 @@ public class UserSubscriptionService {
 
     public List<UserSubscriptionDtoOut> getAllUserSubscriptionsByUserId(Integer userId) {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByUserId(userId);
-        List<UserSubscriptionDtoOut> dtoOuts = new ArrayList<>();
+        List<UserSubscriptionDtoOut> dtoIns = new ArrayList<>();
         for (UserSubscription subscription : subscriptions) {
-            dtoOuts.add(convertToDtoOut(subscription));
+            subscription.setSubscriptionPlan(subscription.getSubscriptionPlan());
         }
-        return dtoOuts;
+        return dtoIns;
     }
 
     public List<UserSubscriptionDtoOut> getAllUserSubscriptionsByStatus(String status) {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByStatus(status);
-        List<UserSubscriptionDtoOut> dtoOuts = new ArrayList<>();
+        List<UserSubscriptionDtoOut> dtoIns = new ArrayList<>();
         for (UserSubscription subscription : subscriptions) {
-            dtoOuts.add(convertToDtoOut(subscription));
+            subscription.setSubscriptionPlan(subscription.getSubscriptionPlan());
         }
-        return dtoOuts;
+        return dtoIns;
     }
 }
