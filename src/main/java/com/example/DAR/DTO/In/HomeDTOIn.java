@@ -11,6 +11,9 @@ public class HomeDTOIn {
     @NotEmpty(message = "Address must not be empty")
     private String address;
 
+    @NotEmpty
+    private String city;
+
     @NotNull(message = "Latitude must not be null")
     private Double latitude;
 

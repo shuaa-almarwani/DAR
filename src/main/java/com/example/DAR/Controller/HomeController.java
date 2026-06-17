@@ -20,15 +20,25 @@ public class HomeController {
         return ResponseEntity.status(200).body(homeService.getAll());
     }
 
-    @PostMapping("/add/{user_id}")
-    public ResponseEntity<?> addHome(@PathVariable Integer user_id, @RequestBody @Valid HomeDTOIn homeDTOIn) {
-        homeService.addHome(user_id, homeDTOIn);
+    @GetMapping("/get/{id}")
+    public ResponseEntity<?> getHome(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(homeService.getHome(id));
+    }
+
+    @GetMapping("/get/user/{userId}")
+    public ResponseEntity<?> getHomesByUser(@PathVariable Integer userId) {
+        return ResponseEntity.status(200).body(homeService.getHomesByUser(userId));
+    }
+
+    @PostMapping("/add/{userId}")
+    public ResponseEntity<?> addHome(@PathVariable Integer userId, @RequestBody @Valid HomeDTOIn homeDTOIn) {
+        homeService.addHome(userId, homeDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Home added successfully"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateHome(@PathVariable Integer id, @RequestBody @Valid HomeDTOIn homeDTOIn) {
-        homeService.updateHome(id, homeDTOIn);
+    @PutMapping("/update/{id}/{userId}")
+    public ResponseEntity<?> updateHome(@PathVariable Integer id, @PathVariable Integer userId, @RequestBody @Valid HomeDTOIn homeDTOIn) {
+        homeService.updateHome(id, userId, homeDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Home updated successfully"));
     }
 

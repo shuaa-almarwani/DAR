@@ -2,6 +2,7 @@ package com.example.DAR.Controller;
 
 import com.example.DAR.Api.ApiResponse;
 import com.example.DAR.DTO.In.UserSubscriptionDtoIn;
+import com.example.DAR.Repository.UserSubscriptionRepository;
 import com.example.DAR.Service.UserSubscriptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,15 @@ public class UserSubscriptionController {
     public ResponseEntity deleteUserSubscription(@PathVariable Integer id) {
         userSubscriptionService.deleteUserSubscription(id);
         return ResponseEntity.status(200).body(new ApiResponse("User subscription deleted successfully"));
+    }
+
+    //
+    @GetMapping("/user-subscriptions/{user-id}")
+    public ResponseEntity getUserSubscriptionsByUserId(@PathVariable Integer userId) {
+        return ResponseEntity.status(200).body(userSubscriptionService.getAllUserSubscriptionsByUserId(userId));
+    }
+    @GetMapping("/user-subscriptions/{status}")
+    public ResponseEntity getUserSubscriptionsByStatus(@PathVariable String status) {
+        return ResponseEntity.status(200).body(userSubscriptionService.getAllUserSubscriptionsByStatus(status));
     }
 }

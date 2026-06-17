@@ -124,4 +124,21 @@ public class UserSubscriptionService {
         userSubscriptionRepository.delete(subscription);
     }
 
+    public List<UserSubscriptionDtoIn> getAllUserSubscriptionsByUserId(Integer userId) {
+        List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByUserId(userId);
+        List<UserSubscriptionDtoIn> dtoIns = new ArrayList<>();
+        for (UserSubscription subscription : subscriptions) {
+            subscription.setSubscriptionPlan(subscription.getSubscriptionPlan());
+        }
+        return dtoIns;
+    }
+
+    public List<UserSubscriptionDtoIn> getAllUserSubscriptionsByStatus(String status) {
+        List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByStatus(status);
+        List<UserSubscriptionDtoIn> dtoIns = new ArrayList<>();
+        for (UserSubscription subscription : subscriptions) {
+            subscription.setSubscriptionPlan(subscription.getSubscriptionPlan());
+        }
+        return dtoIns;
+    }
 }

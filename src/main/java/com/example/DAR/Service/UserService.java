@@ -88,4 +88,19 @@ private final NotificationService notificationService;
         userRepository.delete(user);
     }
 
+    public User getUserById(Integer id) {
+        return userRepository.findUserById(id);
+    }
+    public User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    public List<User> getUserByUserSubscriptions(String subscription) {
+        return userRepository.findUserByUserSubscriptions(subscription);
+    }
+    public User getUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+
 }

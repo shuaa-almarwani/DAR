@@ -8,9 +8,9 @@ import com.example.DAR.Model.User;
 import com.example.DAR.Repository.HomeRepository;
 import com.example.DAR.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,17 +19,34 @@ public class HomeService {
 
     private final HomeRepository homeRepository;
     private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     public List<HomeDTOOut> getAll() {
-        List<HomeDTOOut> homeDTOOuts = new ArrayList<>();
-        for (Home home : homeRepository.findAll()) {
-            homeDTOOuts.add(convertToDTO(home));
-        }
-        return homeDTOOuts;
+        List<Home> homes = homeRepository.findAll();
+
+        return homes.stream().map(h -> modelMapper.map(h, HomeDTOOut.class)).toList();
     }
 
-    public void addHome(Integer user_id, HomeDTOIn homeDTOIn) {
-        User user = userRepository.findUserById(user_id);
+    public HomeDTOOut getHome(Integer id) {
+        Home home = homeRepository.findHomeById(id);
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+        return modelMapper.map(home, HomeDTOOut.class);
+    }
+
+    public List<HomeDTOOut> getHomesByUser(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        List<Home> homes = homeRepository.findHomesByUserId(userId);
+
+        return homes.stream().map(h -> modelMapper.map(h, HomeDTOOut.class)).toList();
+    }
+
+    public void addHome(Integer userId, HomeDTOIn homeDTOIn) {
+        User user = userRepository.findUserById(userId);
         if (user == null) {
             throw new ApiException("User not found");
         }
@@ -38,16 +55,17 @@ public class HomeService {
         home.setLatitude(homeDTOIn.getLatitude());
         home.setLongitude(homeDTOIn.getLongitude());
         home.setBuildYear(homeDTOIn.getBuildYear());
+        home.setCity(homeDTOIn.getCity());
         home.setUser(user);
         homeRepository.save(home);
     }
 
-    public void updateHome(Integer id, HomeDTOIn homeDTOIn) {
+    public void updateHome(Integer id, Integer userId, HomeDTOIn homeDTOIn) {
         Home home = homeRepository.findHomeById(id);
         if (home == null) {
             throw new ApiException("Home not found");
         }
-        User user = userRepository.findUserById(home.getUser().getId());
+        User user = userRepository.findUserById(userId);
         if (user == null) {
             throw new ApiException("User not found");
         }
@@ -55,6 +73,7 @@ public class HomeService {
         home.setLatitude(homeDTOIn.getLatitude());
         home.setLongitude(homeDTOIn.getLongitude());
         home.setBuildYear(homeDTOIn.getBuildYear());
+        home.setCity(homeDTOIn.getCity());
         home.setUser(user);
         homeRepository.save(home);
     }
@@ -65,16 +84,5 @@ public class HomeService {
             throw new ApiException("Home not found");
         }
         homeRepository.deleteById(id);
-    }
-
-    public HomeDTOOut convertToDTO(Home home) {
-        HomeDTOOut homeDTOOut = new HomeDTOOut();
-        homeDTOOut.setId(home.getId());
-        homeDTOOut.setAddress(home.getAddress());
-        homeDTOOut.setLatitude(home.getLatitude());
-        homeDTOOut.setLongitude(home.getLongitude());
-        homeDTOOut.setBuildYear(home.getBuildYear());
-        homeDTOOut.setOwnerName(home.getUser().getName());
-        return homeDTOOut;
     }
 }

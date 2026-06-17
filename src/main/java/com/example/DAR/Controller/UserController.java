@@ -40,4 +40,23 @@ public class UserController {
         return ResponseEntity.status(200).body(new ApiResponse("User deleted successfully"));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity getUserById(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(userService.getUserById(id));
+    }
+    @GetMapping("/email/{email}")
+    public ResponseEntity getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.status(200).body(userService.getUserByEmail(email));
+    }
+    @GetMapping("/subscription-plan/{subscription}")
+    public ResponseEntity getUserBySubscriptionPlan(@PathVariable String subscription) {
+        return ResponseEntity.status(200).body(userService.getUserByUserSubscriptions(subscription));
+    }
+
+    @GetMapping("/username/{username}")
+    public ResponseEntity getUserByUsername(@PathVariable String username) {
+        return ResponseEntity.status(200).body(userService.getUserByUsername(username));
+
+    }
+
 }
