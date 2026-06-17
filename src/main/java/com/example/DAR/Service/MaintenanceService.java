@@ -31,6 +31,42 @@ public class MaintenanceService {
         return maintenanceDTOOuts;
     }
 
+    public MaintenanceDTOOut getMaintenance(Integer id) {
+        Maintenance maintenance = maintenanceRepository.findMaintenanceById(id);
+        if (maintenance == null) {
+            throw new ApiException("Maintenance not found");
+        }
+        return convertToDTO(maintenance);
+    }
+
+    public List<MaintenanceDTOOut> getMaintenancesByHome(Integer homeId) {
+        Home home = homeRepository.findHomeById(homeId);
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+        List<MaintenanceDTOOut> maintenanceDTOOuts = new ArrayList<>();
+        for (Maintenance maintenance : maintenanceRepository.findMaintenancesByHomeId(homeId)) {
+            maintenanceDTOOuts.add(convertToDTO(maintenance));
+        }
+        return maintenanceDTOOuts;
+    }
+
+    public List<MaintenanceDTOOut> getMaintenancesByStatus(String status) {
+        List<MaintenanceDTOOut> maintenanceDTOOuts = new ArrayList<>();
+        for (Maintenance maintenance : maintenanceRepository.findMaintenancesByStatus(status)) {
+            maintenanceDTOOuts.add(convertToDTO(maintenance));
+        }
+        return maintenanceDTOOuts;
+    }
+
+    public List<MaintenanceDTOOut> getMaintenancesByPriority(String priority) {
+        List<MaintenanceDTOOut> maintenanceDTOOuts = new ArrayList<>();
+        for (Maintenance maintenance : maintenanceRepository.findMaintenancesByPriority(priority)) {
+            maintenanceDTOOuts.add(convertToDTO(maintenance));
+        }
+        return maintenanceDTOOuts;
+    }
+
     public void addMaintenance(Integer home_id, Integer homeItem_id, MaintenanceDTOIn maintenanceDTOIn) {
         Home home = homeRepository.findHomeById(home_id);
         if (home == null) {

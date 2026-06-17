@@ -20,6 +20,16 @@ public class HomeItemController {
         return ResponseEntity.status(200).body(homeItemService.getAll());
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<?> getHomeItem(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(homeItemService.getHomeItem(id));
+    }
+
+    @GetMapping("/get/home/{homeId}")
+    public ResponseEntity<?> getHomeItemsByHome(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(homeItemService.getHomeItemsByHome(homeId));
+    }
+
     @PostMapping("/add/{home_id}")
     public ResponseEntity<?> addHomeItem(@PathVariable Integer home_id, @RequestBody @Valid HomeItemDTOIn homeItemDTOIn) {
         homeItemService.addHomeItem(home_id, homeItemDTOIn);

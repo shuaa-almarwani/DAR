@@ -32,6 +32,42 @@ public class MaintenanceReminderService {
         return maintenanceReminderDTOOuts;
     }
 
+    public MaintenanceReminderDTOOut getMaintenanceReminder(Integer id) {
+        MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(id);
+        if (reminder == null) {
+            throw new ApiException("Maintenance reminder not found");
+        }
+        return convertToDTO(reminder);
+    }
+
+    public List<MaintenanceReminderDTOOut> getRemindersByHome(Integer homeId) {
+        Home home = homeRepository.findHomeById(homeId);
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
+        for (MaintenanceReminder reminder : maintenanceReminderRepository.findMaintenanceRemindersByHomeId(homeId)) {
+            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
+        }
+        return maintenanceReminderDTOOuts;
+    }
+
+    public List<MaintenanceReminderDTOOut> getUnsentReminders() {
+        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
+        for (MaintenanceReminder reminder : maintenanceReminderRepository.findMaintenanceRemindersByIsSent(false)) {
+            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
+        }
+        return maintenanceReminderDTOOuts;
+    }
+
+    public List<MaintenanceReminderDTOOut> getRemindersBySeason(String season) {
+        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
+        for (MaintenanceReminder reminder : maintenanceReminderRepository.findMaintenanceRemindersBySeason(season)) {
+            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
+        }
+        return maintenanceReminderDTOOuts;
+    }
+
     public void addMaintenanceReminder(Integer home_id, Integer homeItem_id, MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
         Home home = homeRepository.findHomeById(home_id);
         if (home == null) {
@@ -74,6 +110,15 @@ public class MaintenanceReminderService {
         reminder.setWeatherCondition(maintenanceReminderDTOIn.getWeatherCondition());
         reminder.setHome(home);
         reminder.setHomeItem(homeItem);
+        maintenanceReminderRepository.save(reminder);
+    }
+
+    public void markAsSent(Integer id) {
+        MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(id);
+        if (reminder == null) {
+            throw new ApiException("Maintenance reminder not found");
+        }
+        reminder.setIsSent(true);
         maintenanceReminderRepository.save(reminder);
     }
 

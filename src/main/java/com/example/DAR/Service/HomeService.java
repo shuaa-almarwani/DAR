@@ -28,6 +28,26 @@ public class HomeService {
         return homeDTOOuts;
     }
 
+    public HomeDTOOut getHome(Integer id) {
+        Home home = homeRepository.findHomeById(id);
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+        return convertToDTO(home);
+    }
+
+    public List<HomeDTOOut> getHomesByUser(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        List<HomeDTOOut> homeDTOOuts = new ArrayList<>();
+        for (Home home : homeRepository.findHomesByUserId(userId)) {
+            homeDTOOuts.add(convertToDTO(home));
+        }
+        return homeDTOOuts;
+    }
+
     public void addHome(Integer user_id, HomeDTOIn homeDTOIn) {
         User user = userRepository.findUserById(user_id);
         if (user == null) {

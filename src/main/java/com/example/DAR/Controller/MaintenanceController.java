@@ -20,6 +20,25 @@ public class MaintenanceController {
         return ResponseEntity.status(200).body(maintenanceService.getAll());
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<?> getMaintenance(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(maintenanceService.getMaintenance(id));
+    }
+
+    @GetMapping("/get/home/{homeId}")
+    public ResponseEntity<?> getMaintenancesByHome(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceService.getMaintenancesByHome(homeId));
+    }
+
+    @GetMapping("/get/status/{status}")
+    public ResponseEntity<?> getMaintenancesByStatus(@PathVariable String status) {
+        return ResponseEntity.status(200).body(maintenanceService.getMaintenancesByStatus(status));
+    }
+
+    @GetMapping("/get/priority/{priority}")
+    public ResponseEntity<?> getMaintenancesByPriority(@PathVariable String priority) {
+        return ResponseEntity.status(200).body(maintenanceService.getMaintenancesByPriority(priority));
+    }
     @PostMapping("/add/{home_id}/{homeItem_id}")
     public ResponseEntity<?> addMaintenance(@PathVariable Integer home_id, @PathVariable Integer homeItem_id, @RequestBody @Valid MaintenanceDTOIn maintenanceDTOIn) {
         maintenanceService.addMaintenance(home_id, homeItem_id, maintenanceDTOIn);

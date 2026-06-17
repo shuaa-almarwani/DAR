@@ -28,6 +28,26 @@ public class HomeItemService {
         return homeItemDTOOuts;
     }
 
+    public HomeItemDTOOut getHomeItem(Integer id) {
+        HomeItem homeItem = homeItemRepository.findHomeItemById(id);
+        if (homeItem == null) {
+            throw new ApiException("Home item not found");
+        }
+        return convertToDTO(homeItem);
+    }
+
+    public List<HomeItemDTOOut> getHomeItemsByHome(Integer homeId) {
+        Home home = homeRepository.findHomeById(homeId);
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+        List<HomeItemDTOOut> homeItemDTOOuts = new ArrayList<>();
+        for (HomeItem homeItem : homeItemRepository.findHomeItemsByHomeId(homeId)) {
+            homeItemDTOOuts.add(convertToDTO(homeItem));
+        }
+        return homeItemDTOOuts;
+    }
+
     public void addHomeItem(Integer home_id, HomeItemDTOIn homeItemDTOIn) {
         Home home = homeRepository.findHomeById(home_id);
         if (home == null) {
