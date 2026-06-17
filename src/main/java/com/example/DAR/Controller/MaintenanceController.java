@@ -39,15 +39,16 @@ public class MaintenanceController {
     public ResponseEntity<?> getMaintenancesByPriority(@PathVariable String priority) {
         return ResponseEntity.status(200).body(maintenanceService.getMaintenancesByPriority(priority));
     }
-    @PostMapping("/add/{home_id}/{homeItem_id}")
-    public ResponseEntity<?> addMaintenance(@PathVariable Integer home_id, @PathVariable Integer homeItem_id, @RequestBody @Valid MaintenanceDTOIn maintenanceDTOIn) {
-        maintenanceService.addMaintenance(home_id, homeItem_id, maintenanceDTOIn);
+
+    @PostMapping("/add/{homeId}/{homeItemId}")
+    public ResponseEntity<?> addMaintenance(@PathVariable Integer homeId, @PathVariable Integer homeItemId, @RequestBody @Valid MaintenanceDTOIn maintenanceDTOIn) {
+        maintenanceService.addMaintenance(homeId, homeItemId, maintenanceDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Maintenance added successfully"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateMaintenance(@PathVariable Integer id, @RequestBody @Valid MaintenanceDTOIn maintenanceDTOIn) {
-        maintenanceService.updateMaintenance(id, maintenanceDTOIn);
+    @PutMapping("/update/{id}/{homeId}/{homeItemId}")
+    public ResponseEntity<?> updateMaintenance(@PathVariable Integer id, @PathVariable Integer homeId, @PathVariable Integer homeItemId, @RequestBody @Valid MaintenanceDTOIn maintenanceDTOIn) {
+        maintenanceService.updateMaintenance(id, homeId, homeItemId, maintenanceDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Maintenance updated successfully"));
     }
 

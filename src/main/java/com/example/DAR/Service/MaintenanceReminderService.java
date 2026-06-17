@@ -10,10 +10,10 @@ import com.example.DAR.Repository.HomeItemRepository;
 import com.example.DAR.Repository.HomeRepository;
 import com.example.DAR.Repository.MaintenanceReminderRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,13 +23,13 @@ public class MaintenanceReminderService {
     private final MaintenanceReminderRepository maintenanceReminderRepository;
     private final HomeRepository homeRepository;
     private final HomeItemRepository homeItemRepository;
+    private final ModelMapper modelMapper;
 
     public List<MaintenanceReminderDTOOut> getAll() {
-        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
-        for (MaintenanceReminder reminder : maintenanceReminderRepository.findAll()) {
-            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
-        }
-        return maintenanceReminderDTOOuts;
+
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findAll();
+
+        return reminders.stream().map(m -> modelMapper.map(m, MaintenanceReminderDTOOut.class)).toList();
     }
 
     public MaintenanceReminderDTOOut getMaintenanceReminder(Integer id) {
@@ -37,7 +37,7 @@ public class MaintenanceReminderService {
         if (reminder == null) {
             throw new ApiException("Maintenance reminder not found");
         }
-        return convertToDTO(reminder);
+        return modelMapper.map(reminder, MaintenanceReminderDTOOut.class);
     }
 
     public List<MaintenanceReminderDTOOut> getRemindersByHome(Integer homeId) {
@@ -45,27 +45,21 @@ public class MaintenanceReminderService {
         if (home == null) {
             throw new ApiException("Home not found");
         }
-        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
-        for (MaintenanceReminder reminder : maintenanceReminderRepository.findMaintenanceRemindersByHomeId(homeId)) {
-            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
-        }
-        return maintenanceReminderDTOOuts;
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findMaintenanceRemindersByHomeId(homeId);
+
+        return reminders.stream().map(m -> modelMapper.map(m, MaintenanceReminderDTOOut.class)).toList();
     }
 
     public List<MaintenanceReminderDTOOut> getUnsentReminders() {
-        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
-        for (MaintenanceReminder reminder : maintenanceReminderRepository.findMaintenanceRemindersByIsSent(false)) {
-            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
-        }
-        return maintenanceReminderDTOOuts;
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findMaintenanceRemindersByIsSent(false);
+
+        return reminders.stream().map(m -> modelMapper.map(m, MaintenanceReminderDTOOut.class)).toList();
     }
 
     public List<MaintenanceReminderDTOOut> getRemindersBySeason(String season) {
-        List<MaintenanceReminderDTOOut> maintenanceReminderDTOOuts = new ArrayList<>();
-        for (MaintenanceReminder reminder : maintenanceReminderRepository.findMaintenanceRemindersBySeason(season)) {
-            maintenanceReminderDTOOuts.add(convertToDTO(reminder));
-        }
-        return maintenanceReminderDTOOuts;
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findMaintenanceRemindersBySeason(season);
+
+        return reminders.stream().map(m -> modelMapper.map(m, MaintenanceReminderDTOOut.class)).toList();
     }
 
     public void addMaintenanceReminder(Integer home_id, Integer homeItem_id, MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
@@ -90,16 +84,16 @@ public class MaintenanceReminderService {
         maintenanceReminderRepository.save(reminder);
     }
 
-    public void updateMaintenanceReminder(Integer id, MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
+    public void updateMaintenanceReminder(Integer id, Integer home_id, Integer homeItem_id, MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
         MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(id);
         if (reminder == null) {
             throw new ApiException("Maintenance reminder not found");
         }
-        Home home = homeRepository.findHomeById(reminder.getHome().getId());
+        Home home = homeRepository.findHomeById(home_id);
         if (home == null) {
             throw new ApiException("Home not found");
         }
-        HomeItem homeItem = homeItemRepository.findHomeItemById(reminder.getHome().getId());
+        HomeItem homeItem = homeItemRepository.findHomeItemById(homeItem_id);
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
@@ -130,19 +124,5 @@ public class MaintenanceReminderService {
         maintenanceReminderRepository.deleteById(id);
     }
 
-    public MaintenanceReminderDTOOut convertToDTO(MaintenanceReminder reminder) {
-        MaintenanceReminderDTOOut maintenanceReminderDTOOut = new MaintenanceReminderDTOOut();
-        maintenanceReminderDTOOut.setId(reminder.getId());
-        maintenanceReminderDTOOut.setTitle(reminder.getTitle());
-        maintenanceReminderDTOOut.setMessage(reminder.getMessage());
-        maintenanceReminderDTOOut.setReminderDate(reminder.getReminderDate());
-        maintenanceReminderDTOOut.setSeason(reminder.getSeason());
-        maintenanceReminderDTOOut.setWeatherCondition(reminder.getWeatherCondition());
-        maintenanceReminderDTOOut.setIsSent(reminder.getIsSent());
-        maintenanceReminderDTOOut.setCreatedAt(reminder.getCreatedAt());
-        maintenanceReminderDTOOut.setHomeAddress(reminder.getHome().getAddress());
-        maintenanceReminderDTOOut.setHomeItemCategory(reminder.getHomeItem().getCategory());
-        maintenanceReminderDTOOut.setHomeItemBrand(reminder.getHomeItem().getBrand());
-        return maintenanceReminderDTOOut;
-    }
+    
 }

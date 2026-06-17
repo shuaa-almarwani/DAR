@@ -30,15 +30,15 @@ public class HomeItemController {
         return ResponseEntity.status(200).body(homeItemService.getHomeItemsByHome(homeId));
     }
 
-    @PostMapping("/add/{home_id}")
-    public ResponseEntity<?> addHomeItem(@PathVariable Integer home_id, @RequestBody @Valid HomeItemDTOIn homeItemDTOIn) {
-        homeItemService.addHomeItem(home_id, homeItemDTOIn);
+    @PostMapping("/add/{homeId}")
+    public ResponseEntity<?> addHomeItem(@PathVariable Integer homeId, @RequestBody @Valid HomeItemDTOIn homeItemDTOIn) {
+        homeItemService.addHomeItem(homeId, homeItemDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Home item added successfully"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateHomeItem(@PathVariable Integer id, @RequestBody @Valid HomeItemDTOIn homeItemDTOIn) {
-        homeItemService.updateHomeItem(id, homeItemDTOIn);
+    @PutMapping("/update/{id}/{homeId}")
+    public ResponseEntity<?> updateHomeItem(@PathVariable Integer id, @PathVariable Integer homeId, @RequestBody @Valid HomeItemDTOIn homeItemDTOIn) {
+        homeItemService.updateHomeItem(id, homeId, homeItemDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Home item updated successfully"));
     }
 

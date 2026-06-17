@@ -8,9 +8,9 @@ import com.example.DAR.Model.HomeItem;
 import com.example.DAR.Repository.HomeItemRepository;
 import com.example.DAR.Repository.HomeRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,13 +19,12 @@ public class HomeItemService {
 
     private final HomeItemRepository homeItemRepository;
     private final HomeRepository homeRepository;
+    private final ModelMapper modelMapper;
 
     public List<HomeItemDTOOut> getAll() {
-        List<HomeItemDTOOut> homeItemDTOOuts = new ArrayList<>();
-        for (HomeItem homeItem : homeItemRepository.findAll()) {
-            homeItemDTOOuts.add(convertToDTO(homeItem));
-        }
-        return homeItemDTOOuts;
+        List<HomeItem> homeItems = homeItemRepository.findAll();
+
+        return homeItems.stream().map(h -> modelMapper.map(h, HomeItemDTOOut.class)).toList();
     }
 
     public HomeItemDTOOut getHomeItem(Integer id) {
@@ -33,7 +32,7 @@ public class HomeItemService {
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
-        return convertToDTO(homeItem);
+        return modelMapper.map(homeItem, HomeItemDTOOut.class);
     }
 
     public List<HomeItemDTOOut> getHomeItemsByHome(Integer homeId) {
@@ -41,15 +40,13 @@ public class HomeItemService {
         if (home == null) {
             throw new ApiException("Home not found");
         }
-        List<HomeItemDTOOut> homeItemDTOOuts = new ArrayList<>();
-        for (HomeItem homeItem : homeItemRepository.findHomeItemsByHomeId(homeId)) {
-            homeItemDTOOuts.add(convertToDTO(homeItem));
-        }
-        return homeItemDTOOuts;
+        List<HomeItem> homeItems = homeItemRepository.findHomeItemsByHomeId(homeId);
+
+        return homeItems.stream().map(h -> modelMapper.map(h, HomeItemDTOOut.class)).toList();
     }
 
-    public void addHomeItem(Integer home_id, HomeItemDTOIn homeItemDTOIn) {
-        Home home = homeRepository.findHomeById(home_id);
+    public void addHomeItem(Integer homeId, HomeItemDTOIn homeItemDTOIn) {
+        Home home = homeRepository.findHomeById(homeId);
         if (home == null) {
             throw new ApiException("Home not found");
         }
@@ -64,12 +61,12 @@ public class HomeItemService {
         homeItemRepository.save(homeItem);
     }
 
-    public void updateHomeItem(Integer id, HomeItemDTOIn homeItemDTOIn) {
+    public void updateHomeItem(Integer id, Integer homeId, HomeItemDTOIn homeItemDTOIn) {
         HomeItem homeItem = homeItemRepository.findHomeItemById(id);
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
-        Home home = homeRepository.findHomeById(homeItem.getHome().getId());
+        Home home = homeRepository.findHomeById(homeId);
         if (home == null) {
             throw new ApiException("Home not found");
         }
@@ -89,18 +86,5 @@ public class HomeItemService {
             throw new ApiException("Home item not found");
         }
         homeItemRepository.deleteById(id);
-    }
-
-    public HomeItemDTOOut convertToDTO(HomeItem homeItem) {
-        HomeItemDTOOut homeItemDTOOut = new HomeItemDTOOut();
-        homeItemDTOOut.setId(homeItem.getId());
-        homeItemDTOOut.setCategory(homeItem.getCategory());
-        homeItemDTOOut.setBrand(homeItem.getBrand());
-        homeItemDTOOut.setInstallDate(homeItem.getInstallDate());
-        homeItemDTOOut.setLifespanMonth(homeItem.getLifespanMonth());
-        homeItemDTOOut.setNextServiceDate(homeItem.getNextServiceDate());
-        homeItemDTOOut.setNotes(homeItem.getNotes());
-        homeItemDTOOut.setHomeAddress(homeItem.getHome().getAddress());
-        return homeItemDTOOut;
     }
 }

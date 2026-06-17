@@ -40,15 +40,15 @@ public class MaintenanceReminderController {
         return ResponseEntity.status(200).body(maintenanceReminderService.getRemindersBySeason(season));
     }
 
-    @PostMapping("/add/{home_id}/{homeItem_id}")
-    public ResponseEntity<?> addMaintenanceReminder(@PathVariable Integer home_id, @PathVariable Integer homeItem_id, @RequestBody @Valid MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
-        maintenanceReminderService.addMaintenanceReminder(home_id, homeItem_id, maintenanceReminderDTOIn);
+    @PostMapping("/add/{homeId}/{homeItemId}")
+    public ResponseEntity<?> addMaintenanceReminder(@PathVariable Integer homeId, @PathVariable Integer homeItemId, @RequestBody @Valid MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
+        maintenanceReminderService.addMaintenanceReminder(homeId, homeItemId, maintenanceReminderDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Maintenance reminder added successfully"));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateMaintenanceReminder(@PathVariable Integer id, @RequestBody @Valid MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
-        maintenanceReminderService.updateMaintenanceReminder(id, maintenanceReminderDTOIn);
+    @PutMapping("/update/{id}/{homeId}/{homeItemId}")
+    public ResponseEntity<?> updateMaintenanceReminder(@PathVariable Integer id, @PathVariable Integer homeId, @PathVariable Integer homeItemId, @RequestBody @Valid MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
+        maintenanceReminderService.updateMaintenanceReminder(id, homeId, homeItemId, maintenanceReminderDTOIn);
         return ResponseEntity.status(200).body(new ApiResponse("Maintenance reminder updated successfully"));
     }
 
