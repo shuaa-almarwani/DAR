@@ -2,6 +2,7 @@ package com.example.DAR.DTO.In;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
@@ -27,6 +28,7 @@ public class MaintenanceDTOIn {
     private String status;
 
     @NotEmpty(message = "Priority must not be empty")
+    @Pattern(regexp = "LOW|MEDIUM|HIGH|URGENT", message = "Priority must be LOW, MEDIUM, HIGH, or URGENT")
     private String priority;
 
     @NotEmpty(message = "Notes must not be empty")

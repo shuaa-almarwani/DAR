@@ -24,6 +24,8 @@ public class Notification {
     private String type;
     @Column(nullable = false)
     private LocalDateTime sentAt;
+    @Column(nullable = false)
+    private Boolean isRead = false;
 
     @ManyToOne
     @JoinColumn(name = "home_id")

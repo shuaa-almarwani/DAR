@@ -57,4 +57,26 @@ public class MaintenanceController {
         maintenanceService.deleteMaintenance(id);
         return ResponseEntity.status(200).body(new ApiResponse("Maintenance deleted successfully"));
     }
+    @GetMapping("/upcoming/{homeId}")
+    public ResponseEntity<?> getUpcomingMaintenances(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceService.getUpcomingMaintenances(homeId));
+    }
+
+    @GetMapping("/overdue/{homeId}")
+    public ResponseEntity<?> getOverdueMaintenances(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceService.getOverdueMaintenances(homeId));
+    }
+
+    @PutMapping("/mark-done/{maintenanceId}")
+    public ResponseEntity<?> markMaintenanceAsDone(@PathVariable Integer maintenanceId) {
+        maintenanceService.markMaintenanceAsDone(maintenanceId);
+        return ResponseEntity.status(200).body(new ApiResponse("Maintenance marked as done successfully"));
+    }
+
+    @GetMapping("/summary/{homeId}")
+    public ResponseEntity<?> getMaintenanceSummary(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceService.getMaintenanceSummary(homeId));
+    }
+
+
 }

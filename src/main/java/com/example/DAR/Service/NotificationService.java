@@ -2,6 +2,7 @@ package com.example.DAR.Service;
 
 
 import com.example.DAR.Api.ApiException;
+import com.example.DAR.DTO.Out.NotificationSummaryDTOOut;
 import com.example.DAR.Model.Notification;
 import com.example.DAR.Model.User;
 import com.example.DAR.Repository.NotificationRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -259,4 +261,93 @@ public class NotificationService {
         </div>
         """.formatted(title, message);
     }
+
+    public List<Notification> getNotificationsByUser(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        return notificationRepository.findNotificationsByUserId(userId);
+    }
+
+    public List<Notification> getUnreadNotificationsByUser(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        return notificationRepository.findNotificationsByUserIdAndIsRead(userId, false);
+    }
+
+    public void markNotificationAsRead(Integer notificationId) {
+
+        Notification notification = notificationRepository.findNotificationById(notificationId);
+
+        if (notification == null) {
+            throw new ApiException("Notification not found");
+        }
+
+        notification.setIsRead(true);
+
+        notificationRepository.save(notification);
+    }
+
+    public void markAllNotificationsAsRead(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        List<Notification> notifications = notificationRepository.findNotificationsByUserIdAndIsRead(userId, false);
+
+        for (Notification notification : notifications) {
+            notification.setIsRead(true);
+        }
+
+        notificationRepository.saveAll(notifications);
+    }
+
+    public void deleteNotification(Integer notificationId) {
+
+        Notification notification = notificationRepository.findNotificationById(notificationId);
+
+        if (notification == null) {
+            throw new ApiException("Notification not found");
+        }
+
+        notificationRepository.delete(notification);
+    }
+
+    public NotificationSummaryDTOOut getNotificationSummary(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        List<Notification> notifications = notificationRepository.findNotificationsByUserId(userId);
+
+        int totalNotifications = notifications.size();
+
+        int unreadNotifications = (int) notifications.stream()
+                .filter(notification -> !notification.getIsRead())
+                .count();
+
+        int readNotifications = totalNotifications - unreadNotifications;
+
+        return new NotificationSummaryDTOOut(
+                totalNotifications,
+                unreadNotifications,
+                readNotifications
+        );
+    }
 }
+

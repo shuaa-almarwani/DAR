@@ -2,6 +2,7 @@ package com.example.DAR.Service;
 
 import com.example.DAR.Api.ApiException;
 import com.example.DAR.DTO.In.MaintenanceReminderDTOIn;
+import com.example.DAR.DTO.Out.MaintenanceReminderSummaryDTOOut;
 import com.example.DAR.DTO.Out.MaintenanceReminderDTOOut;
 import com.example.DAR.Model.Home;
 import com.example.DAR.Model.HomeItem;
@@ -124,5 +125,110 @@ public class MaintenanceReminderService {
         maintenanceReminderRepository.deleteById(id);
     }
 
+
+    public List<MaintenanceReminderDTOOut> getUpcomingReminders(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findMaintenanceRemindersByHomeId(homeId);
+
+        return reminders.stream()
+                .filter(r -> !r.getIsSent())
+                .filter(r -> r.getReminderDate().isEqual(today) || r.getReminderDate().isAfter(today))
+                .map(r -> modelMapper.map(r, MaintenanceReminderDTOOut.class))
+                .toList();
+    }
+
+    public List<MaintenanceReminderDTOOut> getTodayReminders(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findMaintenanceRemindersByHomeId(homeId);
+
+        return reminders.stream()
+                .filter(r -> !r.getIsSent())
+                .filter(r -> r.getReminderDate().isEqual(today))
+                .map(r -> modelMapper.map(r, MaintenanceReminderDTOOut.class))
+                .toList();
+    }
+
+    public void sendReminder(Integer reminderId) {
+
+        MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(reminderId);
+
+        if (reminder == null) {
+            throw new ApiException("Maintenance reminder not found");
+        }
+
+        reminder.setIsSent(true);
+
+        maintenanceReminderRepository.save(reminder);
+    }
+
+    public void reactivateReminder(Integer reminderId) {
+
+        MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(reminderId);
+
+        if (reminder == null) {
+            throw new ApiException("Maintenance reminder not found");
+        }
+
+        reminder.setIsSent(false);
+
+        maintenanceReminderRepository.save(reminder);
+    }
+
+    public MaintenanceReminderSummaryDTOOut getReminderSummary(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        List<MaintenanceReminder> reminders = maintenanceReminderRepository.findMaintenanceRemindersByHomeId(homeId);
+
+        int totalReminders = reminders.size();
+
+        int sentReminders = (int) reminders.stream()
+                .filter(MaintenanceReminder::getIsSent)
+                .count();
+
+        int unsentReminders = (int) reminders.stream()
+                .filter(r -> !r.getIsSent())
+                .count();
+
+        int todayReminders = (int) reminders.stream()
+                .filter(r -> !r.getIsSent())
+                .filter(r -> r.getReminderDate().isEqual(today))
+                .count();
+
+        int upcomingReminders = (int) reminders.stream()
+                .filter(r -> !r.getIsSent())
+                .filter(r -> r.getReminderDate().isEqual(today) || r.getReminderDate().isAfter(today))
+                .count();
+
+        return new MaintenanceReminderSummaryDTOOut(
+                totalReminders,
+                upcomingReminders,
+                todayReminders,
+                sentReminders,
+                unsentReminders
+        );
+    }
     
 }

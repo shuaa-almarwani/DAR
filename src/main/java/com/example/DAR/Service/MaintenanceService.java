@@ -3,6 +3,7 @@ package com.example.DAR.Service;
 import com.example.DAR.Api.ApiException;
 import com.example.DAR.DTO.In.MaintenanceDTOIn;
 import com.example.DAR.DTO.Out.MaintenanceDTOOut;
+import com.example.DAR.DTO.Out.MaintenanceSummaryDTOOut;
 import com.example.DAR.Model.Home;
 import com.example.DAR.Model.HomeItem;
 import com.example.DAR.Model.Maintenance;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -113,5 +115,107 @@ public class MaintenanceService {
             throw new ApiException("Maintenance not found");
         }
         maintenanceRepository.deleteById(id);
+    }
+
+    public List<MaintenanceDTOOut> getUpcomingMaintenances(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        List<Maintenance> maintenances = maintenanceRepository.findMaintenancesByHomeId(homeId);
+
+        return maintenances.stream()
+                .filter(m -> !isMaintenanceDone(m))
+                .filter(m -> m.getMaintenanceDate().isEqual(today) || m.getMaintenanceDate().isAfter(today))
+                .map(m -> modelMapper.map(m, MaintenanceDTOOut.class))
+                .toList();
+    }
+
+    public List<MaintenanceDTOOut> getOverdueMaintenances(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        List<Maintenance> maintenances = maintenanceRepository.findMaintenancesByHomeId(homeId);
+
+        return maintenances.stream()
+                .filter(m -> !isMaintenanceDone(m))
+                .filter(m -> m.getMaintenanceDate().isBefore(today))
+                .map(m -> modelMapper.map(m, MaintenanceDTOOut.class))
+                .toList();
+    }
+
+    public void markMaintenanceAsDone(Integer maintenanceId) {
+
+        Maintenance maintenance = maintenanceRepository.findMaintenanceById(maintenanceId);
+
+        if (maintenance == null) {
+            throw new ApiException("Maintenance not found");
+        }
+
+        maintenance.setStatus("DONE");
+
+        maintenanceRepository.save(maintenance);
+    }
+
+    public MaintenanceSummaryDTOOut getMaintenanceSummary(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        List<Maintenance> maintenances = maintenanceRepository.findMaintenancesByHomeId(homeId);
+
+        int totalMaintenances = maintenances.size();
+
+        int doneMaintenances = (int) maintenances.stream()
+                .filter(this::isMaintenanceDone)
+                .count();
+
+        int upcomingMaintenances = (int) maintenances.stream()
+                .filter(m -> !isMaintenanceDone(m))
+                .filter(m -> m.getMaintenanceDate().isEqual(today) || m.getMaintenanceDate().isAfter(today))
+                .count();
+
+        int overdueMaintenances = (int) maintenances.stream()
+                .filter(m -> !isMaintenanceDone(m))
+                .filter(m -> m.getMaintenanceDate().isBefore(today))
+                .count();
+
+        int urgentMaintenances = (int) maintenances.stream()
+                .filter(m -> m.getPriority().equalsIgnoreCase("HIGH") || m.getPriority().equalsIgnoreCase("URGENT"))
+                .count();
+
+        double totalCost = maintenances.stream()
+                .mapToDouble(Maintenance::getCost)
+                .sum();
+
+        return new MaintenanceSummaryDTOOut(
+                totalMaintenances,
+                upcomingMaintenances,
+                overdueMaintenances,
+                doneMaintenances,
+                urgentMaintenances,
+                totalCost
+        );
+    }
+
+    private boolean isMaintenanceDone(Maintenance maintenance) {
+        return maintenance.getStatus().equalsIgnoreCase("DONE")
+                || maintenance.getStatus().equalsIgnoreCase("COMPLETED");
     }
 }

@@ -63,4 +63,31 @@ public class MaintenanceReminderController {
         maintenanceReminderService.deleteMaintenanceReminder(id);
         return ResponseEntity.status(200).body(new ApiResponse("Maintenance reminder deleted successfully"));
     }
+
+    @GetMapping("/upcoming/{homeId}")
+    public ResponseEntity<?> getUpcomingReminders(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceReminderService.getUpcomingReminders(homeId));
+    }
+
+    @GetMapping("/today/{homeId}")
+    public ResponseEntity<?> getTodayReminders(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceReminderService.getTodayReminders(homeId));
+    }
+
+    @PostMapping("/send/{reminderId}")
+    public ResponseEntity<?> sendReminder(@PathVariable Integer reminderId) {
+        maintenanceReminderService.sendReminder(reminderId);
+        return ResponseEntity.status(200).body(new ApiResponse("Maintenance reminder sent successfully"));
+    }
+
+    @PutMapping("/reactivate/{reminderId}")
+    public ResponseEntity<?> reactivateReminder(@PathVariable Integer reminderId) {
+        maintenanceReminderService.reactivateReminder(reminderId);
+        return ResponseEntity.status(200).body(new ApiResponse("Maintenance reminder reactivated successfully"));
+    }
+
+    @GetMapping("/summary/{homeId}")
+    public ResponseEntity<?> getReminderSummary(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(maintenanceReminderService.getReminderSummary(homeId));
+    }
 }
