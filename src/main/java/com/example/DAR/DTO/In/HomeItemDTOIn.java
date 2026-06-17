@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 public class HomeItemDTOIn {
@@ -25,9 +24,8 @@ public class HomeItemDTOIn {
     private Integer lifespanMonth;
 
     @NotNull(message = "Next service date must not be null")
-    private LocalTime nextServiceDate;
+    private LocalDate nextServiceDate;
 
-    @NotEmpty(message = "Notes must not be empty")
     private String notes;
 
 }
