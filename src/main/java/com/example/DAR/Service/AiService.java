@@ -4,6 +4,7 @@ package com.example.DAR.Service;
 import com.example.DAR.Api.ApiException;
 import lombok.RequiredArgsConstructor;
 
+import com.example.DAR.Model.HomeItem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -230,6 +231,23 @@ public class AiService {
                 topic, tone, language
         );
         return callClaudeApi(prompt);
+    }
+
+    public String generateHomeItemMaintenanceAdvice(HomeItem homeItem) {
+        String prompt = "اكتب نصائح صيانة قصيرة باللغة العربية لهذا الجهاز. " +
+                "استخدم لغة بسيطة ومباشرة. أعد 3 نقاط فقط. " +
+                "Device name: " + homeItem.getName() + ". " +
+                "Category: " + homeItem.getCategory() + ". " +
+                "Brand: " + homeItem.getBrand() + ". " +
+                "Model: " + homeItem.getModel() + ". " +
+                "Location: " + homeItem.getLocation() + ". " +
+                "Install date: " + homeItem.getInstallDate() + ". " +
+                "Lifespan months: " + homeItem.getLifespanMonth() + ". " +
+                "Status: " + homeItem.getStatus() + ". " +
+                "Next service date: " + homeItem.getNextServiceDate() + ". " +
+                "Notes: " + homeItem.getNotes() + ".";
+
+        return callClaudeApiText(prompt);
     }
 
 }

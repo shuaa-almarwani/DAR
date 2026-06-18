@@ -77,4 +77,14 @@ public class HomeItemController {
         return ResponseEntity.status(200).body(homeItemService.getHomeItemSummary(homeId));
     }
 
+    @GetMapping("/get/{itemId}/nearby-maintenance")
+    public ResponseEntity<?> getNearbyMaintenancePlaces(@PathVariable Integer itemId) {
+        return ResponseEntity.status(200).body(homeItemService.getNearbyMaintenancePlaces(itemId));
+    }
+
+    @GetMapping("/get/{itemId}/ai-maintenance-advice")
+    public ResponseEntity<?> getAiMaintenanceAdvice(@PathVariable Integer itemId) {
+        return ResponseEntity.status(200).body(homeItemService.getAiMaintenanceAdvice(itemId));
+    }
+
 }
