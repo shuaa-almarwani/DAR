@@ -10,4 +10,6 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
     Bill findBillById(Integer id);
     List<Bill> findBillByHome(Home home);
     List<Bill> findByHomeIdAndType(Integer homeId, String type);
+    List<Bill> findTop3ByHomeIdAndTypeOrderByBillMonthDesc(Integer homeId, String type);
+    List<Bill> findByHomeIdAndIsAnomalyTrue(Integer homeId);
 }

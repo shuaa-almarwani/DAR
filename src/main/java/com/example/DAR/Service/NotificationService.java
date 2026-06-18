@@ -59,6 +59,25 @@ public class NotificationService {
         );
     }
 
+    public void sendBillAnomalyNotification(User user, String billType, int currentConsumption, double avgConsumption, String aiExplanation) {
+        if (user == null) throw new ApiException("User not found");
+
+        String typeAr = switch (billType.toUpperCase()) {
+            case "ELECTRICITY" -> "الكهرباء";
+            case "WATER" -> "الماء";
+            case "GAS" -> "الغاز";
+            default -> billType;
+        };
+
+        int percentage = (int) Math.round(((currentConsumption - avgConsumption) / avgConsumption) * 100);
+
+        String message = "مرحبًا " + user.getName() + "،\n" +
+                "لاحظنا ارتفاعًا غير طبيعي في فاتورة " + typeAr + " بنسبة " + percentage + "%.\n\n" +
+                aiExplanation;
+
+        sendNotification(user, "BILL_ANOMALY", "تنبيه: استهلاك غير طبيعي في فاتورة " + typeAr, message);
+    }
+
     public void sendAccountDeletedNotification(User user) {
 
         if (user == null) {
@@ -95,6 +114,10 @@ public class NotificationService {
 
             case "ACCOUNT_DELETED":
                 subject = "تم حذف حسابك من دار";
+                break;
+
+            case "BILL_ANOMALY":
+                subject = "تنبيه: استهلاك غير طبيعي في فاتورتك";
                 break;
 
             default:

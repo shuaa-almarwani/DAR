@@ -30,6 +30,10 @@ public class BillDtoIn {
     @Positive(message = "Consumption must be greater than zero")
     private Integer consumption;
 
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be greater than zero")
+    private Double amount;
+
     @NotBlank(message = "Unit is required")
     private String unit;
 

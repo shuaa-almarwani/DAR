@@ -16,6 +16,7 @@ public class BillDtoOut {
     private String type;
     private LocalDate billMonth;
     private Integer consumption;
+    private Double amount;
     private String unit;
     private Boolean isInstallment;
     private Integer totalInstallment;

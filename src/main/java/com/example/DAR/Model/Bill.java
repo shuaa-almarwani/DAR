@@ -28,6 +28,9 @@ public class Bill {
     private Integer consumption;
 
     @Column(nullable = false)
+    private Double amount;
+
+    @Column(nullable = false)
     private String unit;
 
     @Column(nullable = false)

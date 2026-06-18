@@ -9,11 +9,15 @@ import com.example.DAR.Model.Home;
 import com.example.DAR.Model.Sensor;
 import com.example.DAR.Repository.BillRepository;
 import com.example.DAR.Repository.HomeRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,8 @@ public class Billservice {
     private final BillRepository billRepository;
     private final HomeRepository homeRepository;
     private final ModelMapper modelMapper;
+    private final AiService aiService;
+    private final NotificationService notificationService;
 
     // CREATE
     public void addBill(Integer homeId, BillDtoIn dto) {
@@ -32,8 +38,22 @@ public class Billservice {
         bill.setHome(home);
         bill.setStatus("PENDING");
         bill.setIsAnomaly(false);
+        billRepository.save(bill);
+        checkAndFlagAnomaly(bill, home);
+    }
 
-         billRepository.save(bill);
+    private void checkAndFlagAnomaly(Bill bill, Home home) {
+        List<Bill> previous = billRepository.findTop3ByHomeIdAndTypeOrderByBillMonthDesc(home.getId(), bill.getType());
+        previous = previous.stream().filter(b -> !b.getId().equals(bill.getId())).toList();
+        if (previous.size() < 2) return;
+
+        double avg = previous.stream().mapToInt(Bill::getConsumption).average().orElse(0);
+        if (avg > 0 && bill.getConsumption() > avg * 1.3) {
+            bill.setIsAnomaly(true);
+            billRepository.save(bill);
+            String aiExplanation = aiService.generateAnomalyExplanation(bill.getType(), bill.getConsumption(), avg, bill.getUnit());
+            notificationService.sendBillAnomalyNotification(home.getUser(), bill.getType(), bill.getConsumption(), avg, aiExplanation);
+        }
     }
 
     // GET ALL by Home
@@ -87,6 +107,42 @@ public class Billservice {
         }
         bill.setStatus("PAID");
         billRepository.save(bill);
+    }
+
+    // UPLOAD IMAGE → AI extract → save Bill
+    public BillDtoOut addBillFromImage(Integer homeId, MultipartFile file) {
+        Home home = homeRepository.findHomeById(homeId);
+        if (home == null) throw new ApiException("home not found");
+
+        String json = aiService.extractBillDataFromImage(file);
+        try {
+            Map<String, Object> data = new ObjectMapper().readValue(json, Map.class);
+            Bill bill = new Bill();
+            bill.setHome(home);
+            bill.setType(((String) data.get("type")).toUpperCase());
+            bill.setBillMonth(LocalDate.parse((String) data.get("billMonth")));
+            bill.setConsumption(((Number) data.get("consumption")).intValue());
+            bill.setAmount(((Number) data.get("amount")).doubleValue());
+            bill.setUnit((String) data.get("unit"));
+            bill.setIsInstallment((Boolean) data.getOrDefault("isInstallment", false));
+            bill.setTotalInstallment(((Number) data.getOrDefault("totalInstallment", 0)).intValue());
+            bill.setPaidInstallment(((Number) data.getOrDefault("paidInstallment", 0)).intValue());
+            bill.setStatus((String) data.getOrDefault("status", "PENDING"));
+            bill.setIsAnomaly(false);
+            bill.setImageUrl((String) data.getOrDefault("imageUrl", ""));
+            billRepository.save(bill);
+            checkAndFlagAnomaly(bill, home);
+            return modelMapper.map(bill, BillDtoOut.class);
+        } catch (Exception e) {
+            throw new ApiException("Failed to parse AI response: " + e.getMessage());
+        }
+    }
+
+    // GET Anomalies by Home
+    public List<BillDtoOut> getAnomalyBills(Integer homeId) {
+        if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
+        return billRepository.findByHomeIdAndIsAnomalyTrue(homeId)
+                .stream().map(b -> modelMapper.map(b, BillDtoOut.class)).toList();
     }
 
     // DELETE

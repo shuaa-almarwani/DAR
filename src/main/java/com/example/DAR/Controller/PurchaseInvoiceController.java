@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/purchase-invoice")
@@ -46,5 +47,10 @@ public class PurchaseInvoiceController {
     @GetMapping("/get/category/{homeId}/{category}")
     public ResponseEntity<?> getInvoicesByCategory(@PathVariable Integer homeId, @PathVariable String category) {
         return ResponseEntity.status(200).body(purchaseInvoiceService.getInvoicesByCategory(homeId, category));
+    }
+
+    @PostMapping("/upload/{homeId}")
+    public ResponseEntity<?> addInvoiceFromImage(@PathVariable Integer homeId, @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.status(200).body(purchaseInvoiceService.addInvoiceFromImage(homeId, file));
     }
 }

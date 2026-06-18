@@ -37,10 +37,8 @@ public class PurchaseInvoice {
     @Column(nullable = false)
     private String imageUrl;
 
-    @Column(nullable = false)
     private String warrantyNote;
 
-    @Column(nullable = false)
     private LocalDate warrantyExpiry;
 
 

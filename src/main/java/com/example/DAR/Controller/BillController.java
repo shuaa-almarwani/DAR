@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/bill")
@@ -52,5 +53,15 @@ public class BillController {
     public ResponseEntity<?> deleteBill(@PathVariable Integer id) {
         billService.deleteBill(id);
         return ResponseEntity.status(200).body(new ApiResponse("Bill deleted successfully"));
+    }
+
+    @PostMapping("/upload/{homeId}")
+    public ResponseEntity<?> addBillFromImage(@PathVariable Integer homeId, @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.status(200).body(billService.addBillFromImage(homeId, file));
+    }
+
+    @GetMapping("/get/anomalies/{homeId}")
+    public ResponseEntity<?> getAnomalyBills(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(billService.getAnomalyBills(homeId));
     }
 }

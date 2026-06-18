@@ -8,19 +8,24 @@ import com.example.DAR.Model.Home;
 import com.example.DAR.Model.PurchaseInvoice;
 import com.example.DAR.Repository.HomeRepository;
 import com.example.DAR.Repository.PurchaseInvoiceRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class PurchaseInvoiceService {
     private final PurchaseInvoiceRepository purchaseInvoiceRepository;
     private final ModelMapper modelMapper;
-    private final HomeRepository homeRepository ;
+    private final HomeRepository homeRepository;
+    private final AiService aiService;
 
     public void addPurchaseInvoice(Integer homeId, PurchaseInvoiceDtoIn dto){
         Home home =homeRepository.findHomeById(homeId);
@@ -62,6 +67,29 @@ public class PurchaseInvoiceService {
         List<PurchaseInvoice> invoices = purchaseInvoiceRepository.findPurchaseInvoiceByHomeIdAndCategory(homeId ,category);
         return invoices.stream().map(invoice -> modelMapper.map(invoice, PurchaseInvoiceDtoOut.class)).toList();
     }
-    //4 extra endpoint
+    // UPLOAD IMAGE → AI extract → save Invoice
+    public PurchaseInvoiceDtoOut addInvoiceFromImage(Integer homeId, MultipartFile file) {
+        Home home = homeRepository.findHomeById(homeId);
+        if (home == null) throw new ApiException("home not found");
 
+        String json = aiService.extractPurchaseInvoiceDataFromImage(file);
+        try {
+            Map<String, Object> data = new ObjectMapper().readValue(json, Map.class);
+            PurchaseInvoice invoice = new PurchaseInvoice();
+            invoice.setHome(home);
+            invoice.setProductName((String) data.get("productName"));
+            invoice.setStore((String) data.get("store"));
+            invoice.setAmount(((Number) data.get("amount")).doubleValue());
+            invoice.setPurchaseDate(LocalDate.parse((String) data.get("purchaseDate")));
+            invoice.setCategory((String) data.get("category"));
+            invoice.setImageUrl((String) data.getOrDefault("imageUrl", ""));
+            invoice.setWarrantyNote((String) data.getOrDefault("warrantyNote", null));
+            String warrantyExpiry = (String) data.getOrDefault("warrantyExpiry", null);
+            invoice.setWarrantyExpiry(warrantyExpiry != null ? LocalDate.parse(warrantyExpiry) : null);
+            purchaseInvoiceRepository.save(invoice);
+            return modelMapper.map(invoice, PurchaseInvoiceDtoOut.class);
+        } catch (Exception e) {
+            throw new ApiException("Failed to parse AI response: " + e.getMessage());
+        }
+    }
 }
