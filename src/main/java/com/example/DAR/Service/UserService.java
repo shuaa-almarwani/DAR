@@ -19,6 +19,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 private final NotificationService notificationService;
+
+
     public List<UserDtoOut> getAllUsers() {
 
         List<User> users = userRepository.findAll();
@@ -88,18 +90,28 @@ private final NotificationService notificationService;
         userRepository.delete(user);
     }
 
-    public User getUserById(Integer id) {
-        return userRepository.findUserById(id);
-    }
-    public User getUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+    public UserDtoOut getUserById(Integer id) {
+        User user = userRepository.findUserById(id);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        return modelMapper.map(user, UserDtoOut.class);
     }
 
-    public List<User> getUserByUserSubscriptions(String subscription) {
-        return userRepository.findUserByUserSubscriptions(subscription);
+    public UserDtoOut getUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        return modelMapper.map(user, UserDtoOut.class);
     }
-    public User getUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
+
+    public UserDtoOut getUserByUsername(String username) {
+        User user = userRepository.findUserByUsername(username);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        return modelMapper.map(user, UserDtoOut.class);
     }
 
 
