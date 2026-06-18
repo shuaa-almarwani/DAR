@@ -45,6 +45,9 @@ public class Home {
     @JsonIgnore
     private Set<MaintenanceReminder> maintenanceReminders;
 
+    @OneToMany(mappedBy = "home", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<HomeItem> homeItems;
 
     @OneToMany(mappedBy = "home", cascade = CascadeType.ALL)
     @JsonIgnore

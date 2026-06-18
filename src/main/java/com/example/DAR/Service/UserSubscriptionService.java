@@ -126,19 +126,19 @@ public class UserSubscriptionService {
 
     public List<UserSubscriptionDtoOut> getAllUserSubscriptionsByUserId(Integer userId) {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByUserId(userId);
-        List<UserSubscriptionDtoOut> dtoIns = new ArrayList<>();
+        List<UserSubscriptionDtoOut> dtoOuts = new ArrayList<>();
         for (UserSubscription subscription : subscriptions) {
-            subscription.setSubscriptionPlan(subscription.getSubscriptionPlan());
+            dtoOuts.add(convertToDtoOut(subscription));
         }
-        return dtoIns;
+        return dtoOuts;
     }
 
     public List<UserSubscriptionDtoOut> getAllUserSubscriptionsByStatus(String status) {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByStatus(status);
-        List<UserSubscriptionDtoOut> dtoIns = new ArrayList<>();
+        List<UserSubscriptionDtoOut> dtoOuts = new ArrayList<>();
         for (UserSubscription subscription : subscriptions) {
-            subscription.setSubscriptionPlan(subscription.getSubscriptionPlan());
+            dtoOuts.add(convertToDtoOut(subscription));
         }
-        return dtoIns;
+        return dtoOuts;
     }
 }

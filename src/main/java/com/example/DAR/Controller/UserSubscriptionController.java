@@ -15,12 +15,12 @@ public class UserSubscriptionController {
     private final UserSubscriptionService userSubscriptionService;
 
     @GetMapping("/get")
-    public ResponseEntity getAllUserSubscriptions() {
+    public ResponseEntity<?> getAllUserSubscriptions() {
         return ResponseEntity.status(200).body(userSubscriptionService.getAllUserSubscriptions());
     }
 
     @PostMapping("/add/{userId}/{planId}")
-    public ResponseEntity addUserSubscription(@PathVariable Integer userId,
+    public ResponseEntity<?> addUserSubscription(@PathVariable Integer userId,
                                               @PathVariable Integer planId,
                                               @RequestBody @Valid UserSubscriptionDtoOut dto) {
         userSubscriptionService.addUserSubscription(userId, planId, dto);
@@ -28,7 +28,7 @@ public class UserSubscriptionController {
     }
 
     @PutMapping("/update/{subscriptionId}/{userId}/{planId}")
-    public ResponseEntity updateUserSubscription(@PathVariable Integer subscriptionId,
+    public ResponseEntity<?> updateUserSubscription(@PathVariable Integer subscriptionId,
                                                  @PathVariable Integer userId,
                                                  @PathVariable Integer planId,
                                                  @RequestBody @Valid UserSubscriptionDtoOut dto) {
@@ -37,18 +37,18 @@ public class UserSubscriptionController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteUserSubscription(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteUserSubscription(@PathVariable Integer id) {
         userSubscriptionService.deleteUserSubscription(id);
         return ResponseEntity.status(200).body(new ApiResponse("User subscription deleted successfully"));
     }
 
-    //
-    @GetMapping("/user-subscriptions/{user-id}")
-    public ResponseEntity getUserSubscriptionsByUserId(@PathVariable Integer userId) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getUserSubscriptionsByUserId(@PathVariable Integer userId) {
         return ResponseEntity.status(200).body(userSubscriptionService.getAllUserSubscriptionsByUserId(userId));
     }
-    @GetMapping("/user-subscriptions/{status}")
-    public ResponseEntity getUserSubscriptionsByStatus(@PathVariable String status) {
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<?> getUserSubscriptionsByStatus(@PathVariable String status) {
         return ResponseEntity.status(200).body(userSubscriptionService.getAllUserSubscriptionsByStatus(status));
     }
 }

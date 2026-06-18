@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -30,9 +29,9 @@ public class HomeItem {
     private Integer lifespanMonth;
 
     @Column(nullable = false)
-    private LocalTime nextServiceDate;
+    private LocalDate nextServiceDate;
 
-    @Column(nullable = false)
+    @Column
     private String notes;
 
 
