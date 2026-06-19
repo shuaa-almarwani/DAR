@@ -1,5 +1,7 @@
 package com.example.DAR.Model;
 
+import com.example.DAR.Enums.HomeItemCategory;
+import com.example.DAR.Enums.HomeItemStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,19 +19,45 @@ public class HomeItem {
     private Integer id;
 
     @Column(nullable = false)
-    private String category;
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private HomeItemCategory category;
+
+    @Column
+    private String customCategory;
 
     @Column(nullable = false)
     private String brand;
 
+    @Column
+    private String model;
+
+    @Column(nullable = false)
+    private String location;
+
     @Column(nullable = false)
     private LocalDate installDate;
+
+    @Column
+    private LocalDate purchaseDate;
 
     @Column(nullable = false)
     private Integer lifespanMonth;
 
+    @Column
+    private Integer warrantyMonths;
+
     @Column(nullable = false)
     private LocalDate nextServiceDate;
+
+    @Column
+    private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private HomeItemStatus status;
 
     @Column
     private String notes;

@@ -27,24 +27,6 @@ public class HomeService {
         return homes.stream().map(h -> modelMapper.map(h, HomeDTOOut.class)).toList();
     }
 
-    public HomeDTOOut getHome(Integer id) {
-        Home home = homeRepository.findHomeById(id);
-        if (home == null) {
-            throw new ApiException("Home not found");
-        }
-        return modelMapper.map(home, HomeDTOOut.class);
-    }
-
-    public List<HomeDTOOut> getHomesByUser(Integer userId) {
-        User user = userRepository.findUserById(userId);
-        if (user == null) {
-            throw new ApiException("User not found");
-        }
-        List<Home> homes = homeRepository.findHomesByUserId(userId);
-
-        return homes.stream().map(h -> modelMapper.map(h, HomeDTOOut.class)).toList();
-    }
-
     public void addHome(Integer userId, HomeDTOIn homeDTOIn) {
         User user = userRepository.findUserById(userId);
         if (user == null) {
@@ -56,6 +38,7 @@ public class HomeService {
         home.setLongitude(homeDTOIn.getLongitude());
         home.setBuildYear(homeDTOIn.getBuildYear());
         home.setCity(homeDTOIn.getCity());
+        home.setPropertyType(homeDTOIn.getPropertyType());
         home.setUser(user);
         homeRepository.save(home);
     }
@@ -74,6 +57,7 @@ public class HomeService {
         home.setLongitude(homeDTOIn.getLongitude());
         home.setBuildYear(homeDTOIn.getBuildYear());
         home.setCity(homeDTOIn.getCity());
+        home.setPropertyType(homeDTOIn.getPropertyType());
         home.setUser(user);
         homeRepository.save(home);
     }
@@ -84,5 +68,24 @@ public class HomeService {
             throw new ApiException("Home not found");
         }
         homeRepository.deleteById(id);
+    }
+
+
+    public HomeDTOOut getHome(Integer id) {
+        Home home = homeRepository.findHomeById(id);
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+        return modelMapper.map(home, HomeDTOOut.class);
+    }
+
+    public List<HomeDTOOut> getHomesByUser(Integer userId) {
+        User user = userRepository.findUserById(userId);
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        List<Home> homes = homeRepository.findHomesByUserId(userId);
+
+        return homes.stream().map(h -> modelMapper.map(h, HomeDTOOut.class)).toList();
     }
 }

@@ -16,45 +16,41 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/get")
-    public ResponseEntity getAllUsers() {
+    public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
 
     @PostMapping("/add")
-    public ResponseEntity addUser(@RequestBody @Valid UserDtoIn dto) {
+    public ResponseEntity<?> addUser(@RequestBody @Valid UserDtoIn dto) {
         userService.addUser(dto);
         return ResponseEntity.status(200).body(new ApiResponse("User added successfully"));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity updateUser(@PathVariable Integer id,
+    public ResponseEntity<?> updateUser(@PathVariable Integer id,
                                      @RequestBody @Valid UserDtoIn dto) {
         userService.updateUser(id, dto);
         return ResponseEntity.status(200).body(new ApiResponse("User updated successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
         return ResponseEntity.status(200).body(new ApiResponse("User deleted successfully"));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity getUserById(@PathVariable Integer id) {
+    public ResponseEntity<?> getUserById(@PathVariable Integer id) {
         return ResponseEntity.status(200).body(userService.getUserById(id));
     }
     @GetMapping("/email/{email}")
-    public ResponseEntity getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
         return ResponseEntity.status(200).body(userService.getUserByEmail(email));
-    }
-    @GetMapping("/subscription-plan/{subscription}")
-    public ResponseEntity getUserBySubscriptionPlan(@PathVariable String subscription) {
-        return ResponseEntity.status(200).body(userService.getUserByUserSubscriptions(subscription));
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.status(200).body(userService.getUserByUsername(username));
 
     }

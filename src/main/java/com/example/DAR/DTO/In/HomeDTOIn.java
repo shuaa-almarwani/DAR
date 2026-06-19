@@ -1,5 +1,6 @@
 package com.example.DAR.DTO.In;
 
+import com.example.DAR.Enums.HomePropertyType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -23,5 +24,8 @@ public class HomeDTOIn {
     @NotNull(message = "Build year must not be null")
     @Positive(message = "Build year must be a positive number")
     private Integer buildYear;
+
+    @NotNull(message = "Property type must not be null")
+    private HomePropertyType propertyType;
 
 }
