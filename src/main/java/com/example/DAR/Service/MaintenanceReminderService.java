@@ -101,7 +101,17 @@ public class MaintenanceReminderService {
         reminder.setHome(maintenance.getHome());
         reminder.setHomeItem(maintenance.getHomeItem());
         reminder.setTitle(dto.getTitle());
-        reminder.setMessage(dto.getMessage());
+        //
+        String reminderMessage;
+
+        try {
+            reminderMessage = generateReminderMessageWithAI(maintenance, dto);
+        } catch (Exception e) {
+            reminderMessage = dto.getMessage();
+        }
+
+        reminder.setMessage(reminderMessage);
+        //
         reminder.setReminderDate(dto.getReminderDate());
         reminder.setSeason(dto.getSeason());
         reminder.setWeatherCondition(dto.getWeatherCondition());
@@ -233,6 +243,11 @@ reminder.setCreatedAt(LocalDate.now());
         }
 
         reminder.setIsSent(true);
+//        if (reminder.getMaintenance().getPriority().equalsIgnoreCase("URGENT")
+//                && !method.equals("CALL")) {
+//            callUserForReminder(user, reminder);
+//        }
+        // شيلي التعليق قبل العرض
         maintenanceReminderRepository.save(reminder);
     }
 //    @Scheduled(cron = "0 0 8 * * *")
@@ -265,8 +280,12 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
     try {
         String subject = "تذكير صيانة من دار";
 
+        String priorityBadge = getPriorityBadge(reminder.getMaintenance().getPriority());
+
         String message =
-                "مرحبًا " + user.getName() + "،<br><br>" +
+                priorityBadge +
+                        "<br>" +
+                        "مرحبًا " + user.getName() + "،<br><br>" +
                         "لديك تذكير صيانة:<br>" +
                         "<b>" + reminder.getTitle() + "</b><br><br>" +
                         reminder.getMessage() + "<br><br>" +
@@ -292,8 +311,11 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
             throw new ApiException("User phone number not found");
         }
 
+        String priorityText = getPriorityText(reminder.getMaintenance().getPriority());
+
         String message =
                 "تذكير صيانة من دار\n\n" +
+                        priorityText + "\n" +
                         "مرحبًا " + user.getName() + "\n" +
                         "لديك تذكير صيانة: " + reminder.getTitle() + "\n" +
                         reminder.getMessage() + "\n" +
@@ -309,6 +331,21 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
             System.out.println("WhatsApp reminder not sent: " + e.getMessage());
             throw new ApiException("WhatsApp reminder not sent");
         }
+    }
+    // helper method to sendReminderByWhatsapp
+    private String getPriorityText(String priority) {
+
+        if (priority == null) {
+            return "الأولوية: غير محددة";
+        }
+
+        return switch (priority.toUpperCase()) {
+            case "URGENT" -> "الأولوية: عاجلة";
+            case "HIGH" -> "الأولوية: عالية";
+            case "MEDIUM" -> "الأولوية: متوسطة";
+            case "LOW" -> "الأولوية: منخفضة";
+            default -> "الأولوية: غير محددة";
+        };
     }
     private void callUserForReminder(User user, MaintenanceReminder reminder) {
 
@@ -427,5 +464,144 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
         return openAIService.generateReaderAnalysis(prompt);
     }
 
+    // helper
+    private String getPriorityBadge(String priority) {
 
+        if (priority == null) {
+            return """
+                <div style="
+                    display:inline-block;
+                    background-color:#F1DCD2;
+                    color:#4A2F25;
+                    padding:6px 14px;
+                    border-radius:999px;
+                    font-size:13px;
+                    font-weight:bold;
+                    margin-bottom:10px;
+                ">
+                    أولوية غير محددة
+                </div>
+                """;
+        }
+
+        switch (priority.toUpperCase()) {
+
+            case "URGENT":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#FDE2E2;
+                        color:#8A1F1F;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية عاجلة
+                    </div>
+                    """;
+
+            case "HIGH":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#FFE8CC;
+                        color:#8A4B00;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية عالية
+                    </div>
+                    """;
+
+            case "MEDIUM":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#F1DCD2;
+                        color:#4A2F25;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية متوسطة
+                    </div>
+                    """;
+
+            case "LOW":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#E6F4EA;
+                        color:#1E6B3A;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية منخفضة
+                    </div>
+                    """;
+
+            default:
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#F1DCD2;
+                        color:#4A2F25;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية غير محددة
+                    </div>
+                    """;
+        }
+    }
+    private String generateReminderMessageWithAI(Maintenance maintenance, MaintenanceReminderDTOIn dto) {
+
+        String weatherDescription = weatherService.getWeatherDescription(maintenance.getHome().getCity());
+
+        String prompt = """
+            You are an AI assistant for DAR, a smart Arabic home maintenance platform.
+
+            DAR does not perform maintenance.
+            DAR helps users remember and organize home maintenance tasks.
+
+            Create a short Arabic maintenance reminder message based on the following data:
+
+            Maintenance title: %s
+            Maintenance description: %s
+            Home item: %s
+            Season: %s
+            Weather trigger selected by user: %s
+            Current weather: %s
+
+            Requirements:
+            - Write in Arabic only.
+            - Keep it short and friendly.
+            - Make the message practical and related to home care.
+            - Do not say that DAR will perform the maintenance.
+            - Tell the user what to check or remember.
+            - Return only the reminder message.
+            """.formatted(
+                maintenance.getTitle(),
+                maintenance.getDescription(),
+                maintenance.getHomeItem().getCategory(),
+                dto.getSeason(),
+                dto.getWeatherCondition(),
+                weatherDescription
+        );
+
+        return openAIService.generateReaderAnalysis(prompt);
+    }
 }

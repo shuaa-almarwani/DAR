@@ -4,12 +4,15 @@ package com.example.DAR.Service;
 import com.example.DAR.Api.ApiException;
 import com.example.DAR.DTO.Out.NotificationSummaryDTOOut;
 import com.example.DAR.Model.Home;
+import com.example.DAR.Model.HomeItem;
 import com.example.DAR.Model.Notification;
 import com.example.DAR.Model.User;
+import com.example.DAR.Repository.HomeItemRepository;
 import com.example.DAR.Repository.HomeRepository;
 import com.example.DAR.Repository.NotificationRepository;
 import com.example.DAR.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,6 +31,7 @@ public class NotificationService {
     private final HomeRepository homeRepository;
     private final WeatherService weatherService;
     private final OpenAIService openAIService;
+    private final HomeItemRepository homeItemRepository;
 
     public List<Notification>  getAllNotifications() {
         return  notificationRepository.findAll();
@@ -557,5 +561,98 @@ public class NotificationService {
     }
 
 
+//    @Scheduled(cron = "0 0 8 * * *")
+@Scheduled(cron = "0 * * * * *")
+public void sendDailyWeatherTipsAutomatically() {
+
+        List<Home> homes = homeRepository.findAll();
+
+        for (Home home : homes) {
+            try {
+                sendDailyWeatherTip(home.getId());
+            } catch (Exception e) {
+                System.out.println("Daily weather tip not sent for home ID: " + home.getId());
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+    public void sendDailyWeatherTip(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        User user = home.getUser();
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        if (!user.getSmartAlertsEnabled()) {
+            throw new ApiException("Smart alerts are disabled");
+        }
+
+        String weatherDescription =
+                weatherService.getWeatherDescription(home.getCity());
+
+        List<HomeItem> items =
+                homeItemRepository.findHomeItemsByHomeId(homeId);
+
+        String itemNames = items.stream()
+                .map(HomeItem::getName)
+                .toList()
+                .toString();
+
+        String prompt = """
+            You are an AI assistant for DAR, a smart Arabic home care platform.
+
+            DAR does not perform maintenance.
+            DAR gives smart reminders and home care advice.
+
+            Based on today's weather and the user's home items, write one short Arabic home care tip.
+
+            City: %s
+            Today's weather: %s
+            User home items: %s
+
+            Requirements:
+            - Arabic only.
+            - Short and practical.
+            - Mention only relevant items from the user's home.
+            - Do not say DAR will perform maintenance.
+            - Give advice the user can do or check.
+            - Return only the message.
+            """.formatted(
+                home.getCity(),
+                weatherDescription,
+                itemNames
+        );
+
+        String aiMessage = openAIService.generateReaderAnalysis(prompt);
+
+        Notification notification = new Notification();
+        notification.setTitle("نصيحة يومية للعناية بالمنزل");
+        notification.setMessage(aiMessage);
+        notification.setType("DAILY_WEATHER_TIP");
+        notification.setIsRead(false);
+        notification.setSentAt(LocalDateTime.now());
+        notification.setHome(home);
+        notification.setUser(user);
+
+        notificationRepository.save(notification);
+
+        String htmlMessage = buildEmailTemplate(
+                "نصيحة يومية من دار",
+                aiMessage
+        );
+
+        emailService.sendEmail(
+                user.getEmail(),
+                "نصيحة يومية من دار",
+                htmlMessage
+        );
+    }
 }
 
