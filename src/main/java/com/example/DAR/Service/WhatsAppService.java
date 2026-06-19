@@ -40,7 +40,7 @@ public class WhatsAppService {
             formattedPhone = "+966" + toPhone; // 5XX → +9665XX
         }
         Message.creator(
-                new PhoneNumber("WhatsApp:" + formattedPhone),
+                new PhoneNumber("whatsapp:" + formattedPhone),
                 new PhoneNumber(from),
                 body
         ).create();

@@ -38,6 +38,8 @@ public class MaintenanceReminder {
     @Column(nullable = false)
     private LocalDate createdAt;
 
+    @Column(nullable = false)
+    private String notificationMethod;
 
     @ManyToOne
     @JoinColumn(name = "home_id")

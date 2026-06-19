@@ -96,10 +96,5 @@ public class MaintenanceReminderController {
     public ResponseEntity<?> getAIWeatherMaintenanceAdvice(@PathVariable Integer homeId) {
         return ResponseEntity.status(200).body(new ApiResponse(maintenanceReminderService.getAIWeatherMaintenanceAdvice(homeId)));
     }
-    @PostMapping("/ai-weather-suggestion/{homeId}/{homeItemId}")
-    public ResponseEntity<?> createAIWeatherReminder(@PathVariable Integer homeId,
-                                                     @PathVariable Integer homeItemId) {
-        maintenanceReminderService.createAIWeatherReminder(homeId, homeItemId);
-        return ResponseEntity.status(200).body(new ApiResponse("AI weather-based reminder created successfully"));
-    }
+
 }

@@ -3,15 +3,19 @@ package com.example.DAR.Service;
 
 import com.example.DAR.Api.ApiException;
 import com.example.DAR.DTO.Out.NotificationSummaryDTOOut;
+import com.example.DAR.Model.Home;
 import com.example.DAR.Model.Notification;
 import com.example.DAR.Model.User;
+import com.example.DAR.Repository.HomeRepository;
 import com.example.DAR.Repository.NotificationRepository;
 import com.example.DAR.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 
 @RequiredArgsConstructor
@@ -21,6 +25,13 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final HomeRepository homeRepository;
+    private final WeatherService weatherService;
+    private final OpenAIService openAIService;
+
+    public List<Notification>  getAllNotifications() {
+        return  notificationRepository.findAll();
+    }
 
     public void sendWelcomeNotification(Integer userId) {
 
@@ -152,7 +163,7 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    private String buildEmailTemplate(String title, String message) {
+    public String buildEmailTemplate(String title, String message) {
 
         String logoUrl = "https://res.cloudinary.com/dhpibz1yq/image/upload/f_auto,q_auto/logo_2_f3xxjb";
 
@@ -190,14 +201,7 @@ public class NotificationService {
                                         إشعار من منصة دار
                                     </div>
 
-                                    <h1 style="
-                                        margin:0;
-                                        color:#3B241C;
-                                        font-size:30px;
-                                        font-weight:900;
-                                    ">
-                                        دار
-                                    </h1>
+                                
 
                                     <p style="
                                         margin:6px 0 0;
@@ -293,6 +297,7 @@ public class NotificationService {
         """.formatted(logoUrl, title, message);
     }
 
+
     public List<Notification> getNotificationsByUser(Integer userId) {
 
         User user = userRepository.findUserById(userId);
@@ -380,5 +385,177 @@ public class NotificationService {
                 readNotifications
         );
     }
+
+
+    public void createWeatherAlertNotification(Integer homeId) {
+
+        Home home = homeRepository.findHomeById(homeId);
+
+        if (home == null) {
+            throw new ApiException("Home not found");
+        }
+
+        User user = home.getUser();
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        if (!user.getSmartAlertsEnabled()) {
+            throw new ApiException("Smart alerts are not enabled for this user");
+        }
+
+        Map<String, Object> weatherData = weatherService.getWeatherData(home.getCity());
+
+        Double temperature = ((Number) weatherData.get("temperature")).doubleValue();
+        Integer humidity = ((Number) weatherData.get("humidity")).intValue();
+        String description = weatherData.get("description").toString();
+
+        String alertType = getWeatherAlertType(temperature, humidity, description);
+
+        if (alertType == null) {
+            throw new ApiException("No weather alert needed today");
+        }
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
+
+        boolean alreadySentToday =
+                notificationRepository.existsNotificationByHomeIdAndTypeAndSentAtBetween(
+                        homeId,
+                        alertType,
+                        startOfDay,
+                        endOfDay
+                );
+
+        if (alreadySentToday) {
+            throw new ApiException("Weather alert already sent today for this home");
+        }
+
+        String prompt = """
+            You are an AI assistant for a smart Arabic home maintenance platform called DAR.
+
+            The platform does not perform maintenance.
+            It only sends smart alerts and reminders to help users take care of their homes.
+
+            Home city: %s
+            Weather description: %s
+            Temperature: %.1f Celsius
+            Humidity: %d
+
+            Alert type: %s
+
+            Write a short Arabic notification message for the homeowner.
+            The message should be practical and related to home care or maintenance.
+            Return only the Arabic notification message.
+            Keep it short, clear, and friendly.
+            """.formatted(
+                home.getCity(),
+                description,
+                temperature,
+                humidity,
+                alertType
+        );
+
+        String aiMessage = openAIService.generateReaderAnalysis(prompt);
+
+        Notification notification = new Notification();
+
+        notification.setUser(user);
+        notification.setHome(home);
+        notification.setTitle("تنبيه ذكي حسب الطقس");
+        notification.setMessage(aiMessage);
+        notification.setType(alertType);
+        notification.setSentAt(LocalDateTime.now());
+        notification.setIsRead(false);
+
+        notificationRepository.save(notification);
+        try {
+            String htmlMessage =
+                    buildEmailTemplate("تنبيه ذكي حسب الطقس", aiMessage.replace("\n", "<br>"));
+
+            emailService.sendEmail(
+                    user.getEmail(),
+                    "تنبيه ذكي حسب الطقس",
+                    htmlMessage
+            );
+
+        } catch (Exception e) {
+            System.out.println("Weather alert email not sent: " + e.getMessage());
+        }
+    }
+    // helper method
+    private String getWeatherAlertType(Double temperature, Integer humidity, String description) {
+
+        String weatherDescription = description.toLowerCase();
+
+        if (temperature >= 40) {
+            return "WEATHER_AC_CHECK";
+        }
+
+        if (temperature <= 12) {
+            return "WEATHER_HEATER_CHECK";
+        }
+
+        if (humidity >= 60) {
+            return "WEATHER_HUMIDITY_CHECK";
+        }
+
+        if (weatherDescription.contains("rain") || weatherDescription.contains("thunderstorm")) {
+            return "WEATHER_LEAK_CHECK";
+        }
+
+        if (weatherDescription.contains("wind") || weatherDescription.contains("storm")) {
+            return "WEATHER_WINDOW_CHECK";
+        }
+
+        return null;
+    }
+    public void sendSmartAlertIntro(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+        if (user.getSmartAlertIntroSent()) {
+            throw new ApiException("Smart alert introduction already sent");
+        }
+
+        String introMessage =
+                "هل ترغب بتفعيل التنبيهات الذكية من دار؟ " +
+                        "سنرسل لك تنبيهات مبنية على الطقس وحالة المنزل لمساعدتك على العناية بمنزلك.";
+
+        Notification notification = new Notification();
+
+        notification.setUser(user);
+        notification.setHome(null);
+        notification.setTitle("تفعيل التنبيهات الذكية");
+        notification.setMessage(introMessage);
+        notification.setType("SMART_ALERT_INTRO");
+        notification.setSentAt(LocalDateTime.now());
+        notification.setIsRead(false);
+
+        notificationRepository.save(notification);
+
+        try {
+            String htmlMessage =
+                    buildEmailTemplate("تفعيل التنبيهات الذكية", introMessage.replace("\n", "<br>"));
+
+            emailService.sendEmail(
+                    user.getEmail(),
+                    "تفعيل التنبيهات الذكية",
+                    htmlMessage
+            );
+
+        } catch (Exception e) {
+            System.out.println("Smart alert intro email not sent: " + e.getMessage());
+        }
+
+        user.setSmartAlertIntroSent(true);
+        userRepository.save(user);
+    }
+
+
 }
 

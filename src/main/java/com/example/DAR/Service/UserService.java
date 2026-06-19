@@ -103,4 +103,18 @@ private final NotificationService notificationService;
     }
 
 
+    public Boolean toggleSmartAlerts(Integer userId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        user.setSmartAlertsEnabled(!user.getSmartAlertsEnabled());
+
+        userRepository.save(user);
+
+        return user.getSmartAlertsEnabled();
+    }
 }
