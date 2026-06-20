@@ -10,10 +10,6 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,12 +29,12 @@ public class PdfReportService {
         List<BillMonthlyReportDtoOut> bills = billService.getMonthlyReport(homeId, year, month);
         PurchaseInvoiceStatsDtoOut stats = purchaseInvoiceService.getStatsByHome(homeId);
 
-        String billsData = bills.isEmpty() ? "لا توجد فواتير" :
-                bills.stream().map(b -> b.getType() + ": استهلاك=" + b.getTotalConsumption() + ", مبلغ=" + b.getTotalAmount() + " ريال")
+        String billsData = bills.isEmpty() ? "No bills found" :
+                bills.stream().map(b -> translateType(b.getType()) + ": consumption=" + b.getTotalConsumption() + ", amount=" + b.getTotalAmount() + " SAR")
                         .collect(Collectors.joining("\n"));
 
-        String purchasesData = stats.getByCategory().isEmpty() ? "لا توجد مشتريات" :
-                stats.getByCategory().stream().map(c -> c.getCategory() + ": " + c.getTotalAmount() + " ريال (" + c.getCount() + " فاتورة)")
+        String purchasesData = stats.getByCategory().isEmpty() ? "No purchases found" :
+                stats.getByCategory().stream().map(c -> c.getCategory() + ": " + c.getTotalAmount() + " SAR (" + c.getCount() + " invoices)")
                         .collect(Collectors.joining("\n"));
 
         String aiSummary = aiService.generateMonthlyReportSummary(home.getAddress(), year, month, billsData, purchasesData);
@@ -46,12 +42,8 @@ public class PdfReportService {
         String html = buildHtml(home.getAddress(), year, month, bills, stats, aiSummary);
 
         try {
-            // نسخ الخط لملف مؤقت عشان ITextRenderer يقدر يوصله
-            Path fontPath = extractFont();
-
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ITextRenderer renderer = new ITextRenderer();
-            renderer.getFontResolver().addFont(fontPath.toString(), true);
             renderer.setDocumentFromString(html);
             renderer.layout();
             renderer.createPDF(out);
@@ -59,26 +51,6 @@ public class PdfReportService {
         } catch (Exception e) {
             throw new ApiException("Failed to generate PDF: " + e.getMessage());
         }
-    }
-
-    private Path extractFont() throws Exception {
-        InputStream is = getClass().getResourceAsStream("/fonts/SFArabic.ttf");
-        if (is == null) throw new ApiException("Arabic font not found in resources");
-        Path tmp = Files.createTempFile("SFArabic", ".ttf");
-        Files.copy(is, tmp, StandardCopyOption.REPLACE_EXISTING);
-        tmp.toFile().deleteOnExit();
-        return tmp;
-    }
-
-    private String markdownToHtml(String text) {
-        return text
-                .replaceAll("(?m)^### (.+)$", "<h3>$1</h3>")
-                .replaceAll("(?m)^## (.+)$", "<h2>$1</h2>")
-                .replaceAll("(?m)^# (.+)$", "<h1>$1</h1>")
-                .replaceAll("\\*\\*(.+?)\\*\\*", "<strong>$1</strong>")
-                .replaceAll("(?m)^- (.+)$", "<li>$1</li>")
-                .replaceAll("---", "<hr/>")
-                .replace("\n", "<br/>");
     }
 
     private String buildHtml(String address, int year, int month,
@@ -89,66 +61,96 @@ public class PdfReportService {
         StringBuilder billRows = new StringBuilder();
         for (BillMonthlyReportDtoOut b : bills) {
             billRows.append("<tr>")
-                    .append("<td>").append(translateType(b.getType())).append("</td>")
-                    .append("<td>").append(b.getTotalConsumption()).append("</td>")
-                    .append("<td>").append(b.getTotalAmount()).append(" ريال</td>")
-                    .append("<td>").append(b.getBillCount()).append("</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(translateType(b.getType())).append("</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(b.getTotalConsumption()).append("</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(b.getTotalAmount()).append(" SAR</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(b.getBillCount()).append("</td>")
                     .append("</tr>");
+        }
+
+        if (bills.isEmpty()) {
+            billRows.append("<tr><td colspan=\"4\" style=\"border:1px solid #E2CFC3; padding:8px; text-align:center; color:#A68972;\">No bills found for this period</td></tr>");
         }
 
         StringBuilder categoryRows = new StringBuilder();
         for (PurchaseInvoiceStatsDtoOut.CategoryStatDtoOut c : stats.getByCategory()) {
             categoryRows.append("<tr>")
-                    .append("<td>").append(c.getCategory()).append("</td>")
-                    .append("<td>").append(c.getTotalAmount()).append(" ريال</td>")
-                    .append("<td>").append(c.getCount()).append("</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(c.getCategory()).append("</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(c.getTotalAmount()).append(" SAR</td>")
+                    .append("<td style=\"border:1px solid #E2CFC3; padding:8px;\">").append(c.getCount()).append("</td>")
                     .append("</tr>");
         }
 
-        String aiHtml = markdownToHtml(aiSummary);
+        if (stats.getByCategory().isEmpty()) {
+            categoryRows.append("<tr><td colspan=\"3\" style=\"border:1px solid #E2CFC3; padding:8px; text-align:center; color:#A68972;\">No purchases found</td></tr>");
+        }
 
-        return """
-            <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-            <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-              <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-              <style>
-                body { font-family: Arial, sans-serif; color: #3E302A; margin: 40px; font-size: 13px; }
-                h1 { color: #765345; font-size: 22px; border-bottom: 2px solid #765345; padding-bottom: 8px; }
-                h2 { color: #765345; font-size: 15px; margin-top: 24px; }
-                h3 { color: #765345; font-size: 13px; margin-top: 10px; }
-                table { width: 100%%; border-collapse: collapse; margin-top: 10px; }
-                th { background-color: #765345; color: white; padding: 8px; text-align: left; }
-                td { border: 1px solid #E2CFC3; padding: 8px; }
-                tr:nth-child(even) { background-color: #FFF8F4; }
-                .ai-box { background-color: #FFF8F4; border: 1px solid #E2CFC3; padding: 16px; margin-top: 16px; line-height: 1.8; }
-                .footer { margin-top: 40px; text-align: center; color: #A68972; font-size: 11px; }
-              </style>
-            </head>
-            <body>
-              <h1>Monthly Report - DAR Platform</h1>
-              <p><strong>Home:</strong> %s    <strong>Period:</strong> %d/%d</p>
+        String aiHtml = aiSummary
+                .replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>")
+                .replaceAll("(?m)^(Consumption Summary:|Expenses Summary:|Observations:|Recommendations:)", "<b style=\"color:#765345;\">$1</b>")
+                .replaceAll("(?m)^- (.+)$", "<span style=\"color:#765345;\">&#8226;</span> $1")
+                .replace("---", "")
+                .replace("\n\n", "</p><p style=\"margin:8px 0;\">")
+                .replace("\n", "<br/>");
 
-              <h2>Utility Bills</h2>
-              <table>
-                <tr><th>Type</th><th>Consumption</th><th>Amount</th><th>Count</th></tr>
-                %s
-              </table>
+        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+               "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" +
+               "<html xmlns=\"http://www.w3.org/1999/xhtml\">" +
+               "<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/></head>" +
+               "<body style=\"margin:0; padding:0; background-color:#E8DED2; font-family:Arial,sans-serif;\">" +
+               "<div style=\"max-width:680px; margin:auto; padding:34px 18px;\">" +
+               "<div style=\"background:linear-gradient(135deg,#FFF8F4 0%,#F7E8E1 55%,#E8DED2 100%); border-radius:24px; overflow:hidden; border:1px solid #E2CFC3;\">" +
 
-              <h2>Purchases by Category</h2>
-              <table>
-                <tr><th>Category</th><th>Total</th><th>Count</th></tr>
-                %s
-              </table>
+               // Header
+               "<div style=\"padding:24px 28px 18px; border-bottom:1px solid rgba(166,137,114,0.22);\">" +
+               "<p style=\"margin:0 0 8px; display:inline-block; background-color:#F3DCD2; color:#765345; padding:7px 14px; border-radius:999px; font-size:13px;\">Monthly Report - DAR Platform</p>" +
+               "<h1 style=\"margin:8px 0 4px; color:#765345; font-size:28px; font-weight:800;\">DAR</h1>" +
+               "<p style=\"margin:0; color:#A68972; font-size:13px;\">Smart Home Management</p>" +
+               "<p style=\"margin:8px 0 0; color:#3E302A; font-size:13px;\"><b>Home:</b> " + address + " &nbsp; <b>Period:</b> " + month + "/" + year + "</p>" +
+               "</div>" +
 
-              <h2>AI Analysis</h2>
-              <div class="ai-box">%s</div>
+               // Bills Table
+               "<div style=\"padding:24px 28px 0;\">" +
+               "<h2 style=\"color:#765345; font-size:16px; margin:0 0 10px;\">Utility Bills</h2>" +
+               "<table style=\"width:100%; border-collapse:collapse;\">" +
+               "<tr>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Type</th>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Consumption</th>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Amount</th>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Count</th>" +
+               "</tr>" +
+               billRows +
+               "</table>" +
+               "</div>" +
 
-              <div class="footer">Auto-generated by DAR Platform - %d/%d</div>
-            </body>
-            </html>
-            """.formatted(address, month, year, billRows, categoryRows, aiHtml, month, year);
+               // Purchases Table
+               "<div style=\"padding:20px 28px 0;\">" +
+               "<h2 style=\"color:#765345; font-size:16px; margin:0 0 10px;\">Purchases by Category</h2>" +
+               "<table style=\"width:100%; border-collapse:collapse;\">" +
+               "<tr>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Category</th>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Total</th>" +
+               "<th style=\"background-color:#765345; color:white; padding:8px; text-align:left; font-size:13px;\">Count</th>" +
+               "</tr>" +
+               categoryRows +
+               "</table>" +
+               "</div>" +
+
+               // AI Analysis
+               "<div style=\"padding:20px 28px;\">" +
+               "<h2 style=\"color:#765345; font-size:16px; margin:0 0 10px;\">AI Analysis</h2>" +
+               "<div style=\"background-color:rgba(255,255,255,0.72); border:1px solid rgba(166,137,114,0.24); border-radius:18px; padding:18px 20px; font-size:13px; color:#3E302A;\">" +
+               "<p style=\"margin:8px 0;\">" + aiHtml + "</p>" +
+               "</div>" +
+               "</div>" +
+
+               // Footer
+               "<div style=\"background-color:#3B241C; padding:18px 28px; text-align:center;\">" +
+               "<p style=\"font-size:13px; color:#E8DED2; margin:0;\">DAR Platform - Monthly Report " + month + "/" + year + "</p>" +
+               "<p style=\"font-size:12px; color:#A68972; margin:8px 0 0;\">Auto-generated report</p>" +
+               "</div>" +
+
+               "</div></div></body></html>";
     }
 
     private String translateType(String type) {
