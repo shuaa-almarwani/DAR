@@ -24,6 +24,10 @@ public class MaintenanceDTOIn {
     @Positive(message = "Cost must be a positive number")
     private Double cost;
 
+    @Pattern(
+            regexp = "^(SCHEDULED|IN_PROGRESS|DONE|CANCELLED)$",
+            message = "Status must be SCHEDULED, IN_PROGRESS, DONE, or CANCELLED"
+    )
     @NotEmpty(message = "Status must not be empty")
     private String status;
 

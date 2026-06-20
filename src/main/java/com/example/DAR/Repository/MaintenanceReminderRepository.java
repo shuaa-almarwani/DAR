@@ -4,6 +4,7 @@ import com.example.DAR.Model.MaintenanceReminder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -16,5 +17,10 @@ public interface MaintenanceReminderRepository extends JpaRepository<Maintenance
     List<MaintenanceReminder> findMaintenanceRemindersByIsSent(Boolean isSent);
 
     List<MaintenanceReminder> findMaintenanceRemindersBySeason(String season);
+
     List<MaintenanceReminder> findMaintenanceRemindersByMaintenanceId(Integer maintenanceId);
+    List<MaintenanceReminder> findMaintenanceRemindersByReminderDateAndIsSent(
+            LocalDate reminderDate,
+            Boolean isSent
+    );
 }

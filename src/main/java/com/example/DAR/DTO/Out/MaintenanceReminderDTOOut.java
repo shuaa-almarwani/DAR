@@ -24,4 +24,6 @@ public class MaintenanceReminderDTOOut {
     private String maintenanceTitle;
     private String maintenancePriority;
     private String maintenanceStatus;
+
+    private String notificationMethod;
 }

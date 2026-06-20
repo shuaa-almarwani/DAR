@@ -36,6 +36,14 @@ public class User {
     @Column(nullable = false)
     private LocalDate createAt;
 
+    //
+    @Column(nullable = false)
+    private Boolean smartAlertsEnabled = false;
+
+    @Column(nullable = false)
+    private Boolean smartAlertIntroSent = false;
+    //
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserSubscription> userSubscriptions;
@@ -46,6 +54,7 @@ public class User {
     private Set<Home> homes;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Notification> notifications;
 
 }

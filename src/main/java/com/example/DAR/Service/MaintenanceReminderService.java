@@ -15,10 +15,29 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.scheduling.annotation.Scheduled;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Call;
+import com.twilio.type.PhoneNumber;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.net.URI;
 @Service
 @RequiredArgsConstructor
 public class MaintenanceReminderService {
+
+    @Value("${twilio.account.sid}")
+    private String accountSid;
+
+    @Value("${twilio.auth.token}")
+    private String authToken;
+
+    @Value("${twilio.voice.from}")
+    private String voiceFrom;
+
+    @Value("${twilio.voice.twiml-url}")
+    private String twimlUrl;
+    ////
 
     private final MaintenanceReminderRepository maintenanceReminderRepository;
     private final HomeRepository homeRepository;
@@ -27,6 +46,9 @@ public class MaintenanceReminderService {
     private final WeatherService weatherService;
     private final OpenAIService openAIService;
     private final MaintenanceRepository maintenanceRepository;
+    private final EmailService emailService;
+    private final WhatsAppService whatsAppService;
+    private final NotificationService notificationService;
 
     public List<MaintenanceReminderDTOOut> getAll() {
 
@@ -78,14 +100,24 @@ public class MaintenanceReminderService {
         reminder.setMaintenance(maintenance);
         reminder.setHome(maintenance.getHome());
         reminder.setHomeItem(maintenance.getHomeItem());
-
         reminder.setTitle(dto.getTitle());
-        reminder.setMessage(dto.getMessage());
+        //
+        String reminderMessage;
+
+        try {
+            reminderMessage = generateReminderMessageWithAI(maintenance, dto);
+        } catch (Exception e) {
+            reminderMessage = dto.getMessage();
+        }
+
+        reminder.setMessage(reminderMessage);
+        //
         reminder.setReminderDate(dto.getReminderDate());
         reminder.setSeason(dto.getSeason());
         reminder.setWeatherCondition(dto.getWeatherCondition());
-
+reminder.setCreatedAt(LocalDate.now());
         reminder.setIsSent(false);
+        reminder.setNotificationMethod(dto.getNotificationMethod());
 
         maintenanceReminderRepository.save(reminder);
     }
@@ -109,7 +141,10 @@ public class MaintenanceReminderService {
         reminder.setWeatherCondition(maintenanceReminderDTOIn.getWeatherCondition());
         reminder.setHome(home);
         reminder.setHomeItem(homeItem);
+        reminder.setCreatedAt(LocalDate.now());
+        reminder.setNotificationMethod(maintenanceReminderDTOIn.getNotificationMethod());
         maintenanceReminderRepository.save(reminder);
+
     }
 
     public void markAsSent(Integer id) {
@@ -170,10 +205,15 @@ public class MaintenanceReminderService {
 
     public void sendReminder(Integer reminderId) {
 
-        MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(reminderId);
+        MaintenanceReminder reminder =
+                maintenanceReminderRepository.findMaintenanceReminderById(reminderId);
 
         if (reminder == null) {
             throw new ApiException("Maintenance reminder not found");
+        }
+
+        if (reminder.getIsSent()) {
+            throw new ApiException("Maintenance reminder already sent");
         }
 
         User user = reminder.getHome().getUser();
@@ -182,26 +222,159 @@ public class MaintenanceReminderService {
             throw new ApiException("User not found");
         }
 
-        if (reminder.getMaintenance().getPriority().equalsIgnoreCase("URGENT")) {
-            callUserForUrgentReminder(user, reminder);
+        String method = reminder.getNotificationMethod().toUpperCase();
+
+        switch (method) {
+
+            case "EMAIL":
+                sendReminderByEmail(user, reminder);
+                break;
+
+            case "WHATSAPP":
+                sendReminderByWhatsapp(user, reminder);
+                break;
+
+            case "CALL":
+                callUserForReminder(user, reminder);
+                break;
+
+            default:
+                throw new ApiException("Invalid notification method");
         }
 
         reminder.setIsSent(true);
-
+//        if (reminder.getMaintenance().getPriority().equalsIgnoreCase("URGENT")
+//                && !method.equals("CALL")) {
+//            callUserForReminder(user, reminder);
+//        }
+        // شيلي التعليق قبل العرض
         maintenanceReminderRepository.save(reminder);
     }
-// helper
-private void callUserForUrgentReminder(User user, MaintenanceReminder reminder) {
+//    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = " 0 * * * * *")
+    // للتجربة بينرسل كل دقيقة
 
-    if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
-        throw new ApiException("User phone number not found");
+    public void sendTodayRemindersAutomatically() {
+
+        LocalDate today = LocalDate.now();
+
+        List<MaintenanceReminder> reminders =
+                maintenanceReminderRepository.findMaintenanceRemindersByReminderDateAndIsSent(today, false);
+
+        for (MaintenanceReminder reminder : reminders) {
+            try {
+                sendReminder(reminder.getId());
+            } catch (Exception e) {
+                System.out.println("Reminder not sent. ID: " + reminder.getId());
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+// helper method to send
+private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
+
+    if (user.getEmail() == null || user.getEmail().isEmpty()) {
+        throw new ApiException("User email not found");
     }
 
-    System.out.println("Calling user for urgent maintenance reminder");
-    System.out.println("Phone number: " + user.getPhoneNumber());
-    System.out.println("Maintenance title: " + reminder.getMaintenance().getTitle());
-    System.out.println("Reminder message: " + reminder.getMessage());
+    try {
+        String subject = "تذكير صيانة من دار";
+
+        String priorityBadge = getPriorityBadge(reminder.getMaintenance().getPriority());
+
+        String message =
+                priorityBadge +
+                        "<br>" +
+                        "مرحبًا " + user.getName() + "،<br><br>" +
+                        "لديك تذكير صيانة:<br>" +
+                        "<b>" + reminder.getTitle() + "</b><br><br>" +
+                        reminder.getMessage() + "<br><br>" +
+                        "تاريخ التذكير: " + reminder.getReminderDate();
+
+        String htmlMessage =
+                notificationService.buildEmailTemplate(subject, message);
+
+        emailService.sendEmail(
+                user.getEmail(),
+                subject,
+                htmlMessage
+        );
+
+    } catch (Exception e) {
+        System.out.println("Email reminder not sent: " + e.getMessage());
+        throw new ApiException("Email reminder not sent");
+    }
 }
+    private void sendReminderByWhatsapp(User user, MaintenanceReminder reminder) {
+
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
+            throw new ApiException("User phone number not found");
+        }
+
+        String priorityText = getPriorityText(reminder.getMaintenance().getPriority());
+
+        String message =
+                "تذكير صيانة من دار\n\n" +
+                        priorityText + "\n" +
+                        "مرحبًا " + user.getName() + "\n" +
+                        "لديك تذكير صيانة: " + reminder.getTitle() + "\n" +
+                        reminder.getMessage() + "\n" +
+                        "تاريخ التذكير: " + reminder.getReminderDate();
+
+        try {
+            whatsAppService.whatsAppMessage(
+                    user.getPhoneNumber(),
+                    message
+            );
+
+        } catch (Exception e) {
+            System.out.println("WhatsApp reminder not sent: " + e.getMessage());
+            throw new ApiException("WhatsApp reminder not sent");
+        }
+    }
+    // helper method to sendReminderByWhatsapp
+    private String getPriorityText(String priority) {
+
+        if (priority == null) {
+            return "الأولوية: غير محددة";
+        }
+
+        return switch (priority.toUpperCase()) {
+            case "URGENT" -> "الأولوية: عاجلة";
+            case "HIGH" -> "الأولوية: عالية";
+            case "MEDIUM" -> "الأولوية: متوسطة";
+            case "LOW" -> "الأولوية: منخفضة";
+            default -> "الأولوية: غير محددة";
+        };
+    }
+    private void callUserForReminder(User user, MaintenanceReminder reminder) {
+
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
+            throw new ApiException("User phone number not found");
+        }
+
+        String formattedPhone = user.getPhoneNumber().trim();
+
+        formattedPhone = formattedPhone.replace("whatsapp:", "");
+        formattedPhone = formattedPhone.replace("WhatsApp:", "");
+        formattedPhone = formattedPhone.replace("WHATSAPP:", "");
+
+        if (formattedPhone.startsWith("05")) {
+            formattedPhone = "+966" + formattedPhone.substring(1);
+        } else if (formattedPhone.startsWith("5")) {
+            formattedPhone = "+966" + formattedPhone;
+        }
+
+        Twilio.init(accountSid, authToken);
+
+        Call call = Call.creator(
+                new PhoneNumber(formattedPhone),
+                new PhoneNumber(voiceFrom),
+                URI.create(twimlUrl)
+        ).create();
+
+        System.out.println("Maintenance reminder call started. SID: " + call.getSid());
+    }
     public void reactivateReminder(Integer reminderId) {
 
         MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(reminderId);
@@ -290,68 +463,145 @@ private void callUserForUrgentReminder(User user, MaintenanceReminder reminder) 
 
         return openAIService.generateReaderAnalysis(prompt);
     }
-    //#2
-    public void createAIWeatherReminder(Integer homeId, Integer homeItemId) {
 
-        Home home = homeRepository.findHomeById(homeId);
+    // helper
+    private String getPriorityBadge(String priority) {
 
-        if (home == null) {
-            throw new ApiException("Home not found");
+        if (priority == null) {
+            return """
+                <div style="
+                    display:inline-block;
+                    background-color:#F1DCD2;
+                    color:#4A2F25;
+                    padding:6px 14px;
+                    border-radius:999px;
+                    font-size:13px;
+                    font-weight:bold;
+                    margin-bottom:10px;
+                ">
+                    أولوية غير محددة
+                </div>
+                """;
         }
 
-        HomeItem homeItem = homeItemRepository.findHomeItemById(homeItemId);
+        switch (priority.toUpperCase()) {
 
-        if (homeItem == null) {
-            throw new ApiException("Home item not found");
+            case "URGENT":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#FDE2E2;
+                        color:#8A1F1F;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية عاجلة
+                    </div>
+                    """;
+
+            case "HIGH":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#FFE8CC;
+                        color:#8A4B00;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية عالية
+                    </div>
+                    """;
+
+            case "MEDIUM":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#F1DCD2;
+                        color:#4A2F25;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية متوسطة
+                    </div>
+                    """;
+
+            case "LOW":
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#E6F4EA;
+                        color:#1E6B3A;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية منخفضة
+                    </div>
+                    """;
+
+            default:
+                return """
+                    <div style="
+                        display:inline-block;
+                        background-color:#F1DCD2;
+                        color:#4A2F25;
+                        padding:6px 14px;
+                        border-radius:999px;
+                        font-size:13px;
+                        font-weight:bold;
+                        margin-bottom:10px;
+                    ">
+                        أولوية غير محددة
+                    </div>
+                    """;
         }
+    }
+    private String generateReminderMessageWithAI(Maintenance maintenance, MaintenanceReminderDTOIn dto) {
 
-        String weatherDescription = weatherService.getWeatherDescription(home.getCity());
+        String weatherDescription = weatherService.getWeatherDescription(maintenance.getHome().getCity());
 
         String prompt = """
-            You are an AI assistant for a smart Arabic home maintenance platform called DAR.
+            You are an AI assistant for DAR, a smart Arabic home maintenance platform.
 
-            The platform does not perform maintenance.
-            It only creates reminders for the user.
+            DAR does not perform maintenance.
+            DAR helps users remember and organize home maintenance tasks.
 
-            Home city and weather:
-            %s
+            Create a short Arabic maintenance reminder message based on the following data:
 
-            Home item:
-            %s
+            Maintenance title: %s
+            Maintenance description: %s
+            Home item: %s
+            Season: %s
+            Weather trigger selected by user: %s
+            Current weather: %s
 
-            Based on the weather and the home item, write a short Arabic reminder message.
-            The reminder should be practical and related to this item.
+            Requirements:
+            - Write in Arabic only.
+            - Keep it short and friendly.
+            - Make the message practical and related to home care.
+            - Do not say that DAR will perform the maintenance.
+            - Tell the user what to check or remember.
+            - Return only the reminder message.
+            """.formatted(
+                maintenance.getTitle(),
+                maintenance.getDescription(),
+                maintenance.getHomeItem().getCategory(),
+                dto.getSeason(),
+                dto.getWeatherCondition(),
+                weatherDescription
+        );
 
-            Return only the reminder message in Arabic.
-            """.formatted(weatherDescription, homeItem.getCategory());
-
-        String aiReminderMessage = openAIService.generateReaderAnalysis(prompt);
-
-        MaintenanceReminder reminder = new MaintenanceReminder();
-
-        reminder.setHome(home);
-        reminder.setHomeItem(homeItem);
-        reminder.setTitle("تذكير ذكي حسب الطقس");
-        reminder.setMessage(aiReminderMessage);
-        reminder.setReminderDate(LocalDate.now().plusDays(1));
-        reminder.setSeason(getCurrentSeason());
-        reminder.setWeatherCondition(weatherDescription);
-        reminder.setIsSent(false);
-
-        maintenanceReminderRepository.save(reminder);
-    }
-    private String getCurrentSeason() {
-
-        int month = LocalDate.now().getMonthValue();
-
-        if (month == 12 || month == 1 || month == 2) {
-            return "WINTER";
-        } else if (month >= 3 && month <= 5) {
-            return "SPRING";
-        } else if (month >= 6 && month <= 8) {
-            return "SUMMER";
-        } else {
-            return "AUTUMN";
-        }
+        return openAIService.generateReaderAnalysis(prompt);
     }
 }

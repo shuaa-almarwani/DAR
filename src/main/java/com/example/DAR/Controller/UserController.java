@@ -54,5 +54,16 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getUserByUsername(username));
 
     }
+    @PutMapping("/toggle-smart-alerts/{userId}")
+    public ResponseEntity<?> toggleSmartAlerts(@PathVariable Integer userId) {
+
+        Boolean status = userService.toggleSmartAlerts(userId);
+
+        if (status) {
+            return ResponseEntity.status(200).body(new ApiResponse("Smart alerts enabled successfully"));
+        }
+
+        return ResponseEntity.status(200).body(new ApiResponse("Smart alerts disabled successfully"));
+    }
 
 }

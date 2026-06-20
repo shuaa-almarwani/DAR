@@ -2,6 +2,7 @@ package com.example.DAR.DTO.In;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -19,9 +20,23 @@ public class MaintenanceReminderDTOIn {
     private LocalDate reminderDate;
 
     @NotEmpty(message = "Season must not be empty")
+    @Pattern(
+            regexp = "^(SUMMER|WINTER|SPRING|AUTUMN)$",
+            message = "Season must be SUMMER, WINTER, SPRING, or AUTUMN"
+    )
     private String season;
 
     @NotEmpty(message = "Weather condition must not be empty")
+    @Pattern(
+            regexp = "^(HOT|RAIN|DUST|COLD|HUMID|WIND)$",
+            message = "Weather condition must be HOT, RAIN, DUST, COLD, HUMID, or WIND"
+    )
     private String weatherCondition;
 
+    @NotEmpty(message = "Notification method cannot be empty")
+    @Pattern(
+            regexp = "^(EMAIL|WHATSAPP|CALL)$",
+            message = "Notification method must be EMAIL, WHATSAPP, or CALL"
+    )
+    private String notificationMethod;
 }
