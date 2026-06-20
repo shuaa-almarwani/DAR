@@ -198,16 +198,16 @@ public class AiService {
 
     public String generateMonthlyReportSummary(String homeAddress, int year, int month, String billsData, String purchasesData) {
         String prompt = String.format(
-            "You are a smart home management assistant. Write a professional monthly report in English for the home at: %s\n" +
+            "You are a smart home assistant for DAR platform. Write a concise monthly report in English for the home at: %s\n" +
             "Period: %d/%d\n\n" +
             "Bills Data:\n%s\n\n" +
             "Purchases Data:\n%s\n\n" +
-            "Write the report with this structure (plain text only, no markdown symbols like # or **):\n" +
-            "1. Consumption Summary: (analysis of electricity, water, and gas bills)\n" +
-            "2. Expenses Summary: (total purchases by category)\n" +
-            "3. Observations: (any notable increases or decreases)\n" +
-            "4. Recommendations: (3 practical saving tips)\n" +
-            "Keep it concise and clear.",
+            "Structure the report in exactly 4 short paragraphs with these plain labels (no markdown, no symbols):\n" +
+            "Consumption Summary: one sentence about utility usage.\n" +
+            "Expenses Summary: one sentence about purchases.\n" +
+            "Observations: one sentence about anything unusual.\n" +
+            "Recommendations: three short bullet points starting with a dash (-).\n" +
+            "Keep it brief and easy to read.",
             homeAddress, month, year, billsData, purchasesData
         );
         return callClaudeApiText(prompt);
