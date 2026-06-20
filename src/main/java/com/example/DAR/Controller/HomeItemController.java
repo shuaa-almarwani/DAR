@@ -2,6 +2,7 @@ package com.example.DAR.Controller;
 
 import com.example.DAR.Api.ApiResponse;
 import com.example.DAR.DTO.In.HomeItemDTOIn;
+import com.example.DAR.DTO.In.TroubleshootingDTOIn;
 import com.example.DAR.Enums.HomeItemCategory;
 import com.example.DAR.Enums.HomeItemStatus;
 import com.example.DAR.Service.HomeItemService;
@@ -85,6 +86,17 @@ public class HomeItemController {
     @GetMapping("/get/{itemId}/ai-maintenance-advice")
     public ResponseEntity<?> getAiMaintenanceAdvice(@PathVariable Integer itemId) {
         return ResponseEntity.status(200).body(homeItemService.getAiMaintenanceAdvice(itemId));
+    }
+
+    @PostMapping("/get/{itemId}/ai-troubleshooting")
+    public ResponseEntity<?> getAiTroubleshootingSteps(@PathVariable Integer itemId,
+                                                       @RequestBody @Valid TroubleshootingDTOIn troubleshootingDTOIn) {
+        return ResponseEntity.status(200).body(homeItemService.getAiTroubleshootingSteps(itemId, troubleshootingDTOIn));
+    }
+
+    @GetMapping("/get/{itemId}/ai-nearby-recommendation")
+    public ResponseEntity<?> getAiNearbyServiceRecommendation(@PathVariable Integer itemId) {
+        return ResponseEntity.status(200).body(homeItemService.getAiNearbyServiceRecommendation(itemId));
     }
 
 }

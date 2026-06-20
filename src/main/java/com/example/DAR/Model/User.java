@@ -36,7 +36,8 @@ public class User {
     @Column(nullable = false)
     private LocalDate createAt;
 
-    //
+    private Integer aiCounter;
+
     @Column(nullable = false)
     private Boolean smartAlertsEnabled = false;
 

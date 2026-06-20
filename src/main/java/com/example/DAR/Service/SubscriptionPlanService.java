@@ -32,6 +32,7 @@ public class SubscriptionPlanService {
         SubscriptionPlan plan = modelMapper.map(dto, SubscriptionPlan.class);
         subscriptionPlanRepository.save(plan);
     }
+
     public void updatePlan(Integer id, SubscriptionPlanDtoIn dto) {
         SubscriptionPlan plan = subscriptionPlanRepository.findSubscriptionPlanById(id);
 
@@ -43,15 +44,13 @@ public class SubscriptionPlanService {
         plan.setSubtitle(dto.getSubtitle());
         plan.setPrice(dto.getPrice());
         plan.setIsPopular(dto.getIsPopular());
-        plan.setContactSales(dto.getContactSales());
         plan.setMaxHomes(dto.getMaxHomes());
         plan.setMaxItems(dto.getMaxItems());
         plan.setMaxSensors(dto.getMaxSensors());
         plan.setMaxNotificationsPerMonth(dto.getMaxNotificationsPerMonth());
         plan.setMaxAiReportsPerMonth(dto.getMaxAiReportsPerMonth());
         plan.setWeatherReminderEnabled(dto.getWeatherReminderEnabled());
-        plan.setUsageSpikeDetectionEnabled(dto.getUsageSpikeDetectionEnabled());
-        plan.setPrioritySupportEnabled(dto.getPrioritySupportEnabled());
+        plan.setDailyAIReminder(dto.getDailyAIReminder());
 
         subscriptionPlanRepository.save(plan);
     }

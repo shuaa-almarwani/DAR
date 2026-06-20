@@ -44,6 +44,7 @@ private final NotificationService notificationService;
         }
 
         User user = modelMapper.map(dto, User.class);
+        user.setAiCounter(0);
         user.setCreateAt(LocalDate.now());
 
         userRepository.save(user);
