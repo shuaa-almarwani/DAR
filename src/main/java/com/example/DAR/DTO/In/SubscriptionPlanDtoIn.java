@@ -23,19 +23,16 @@ public class SubscriptionPlanDtoIn {
     @NotNull(message = "Popular flag is required")
     private Boolean isPopular;
 
-    @NotNull(message = "Contact sales flag is required")
-    private Boolean contactSales;
-
     @NotNull(message = "Max homes is required")
-    @Positive(message = "Max homes must be positive")
+    @PositiveOrZero(message = "Max homes must be zero or positive")
     private Integer maxHomes;
 
     @NotNull(message = "Max items is required")
-    @Positive(message = "Max items must be positive")
+    @PositiveOrZero(message = "Max items must be zero or positive")
     private Integer maxItems;
 
     @NotNull(message = "Max sensors is required")
-    @Positive(message = "Max sensors must be positive")
+    @PositiveOrZero(message = "Max sensors must be zero or positive")
     private Integer maxSensors;
 
     @NotNull(message = "Max notifications per month is required")
@@ -49,9 +46,8 @@ public class SubscriptionPlanDtoIn {
     @NotNull(message = "Weather reminder enabled is required")
     private Boolean weatherReminderEnabled;
 
-    @NotNull(message = "Usage spike detection enabled is required")
-    private Boolean usageSpikeDetectionEnabled;
+    @NotNull(message = "daily AI reminder enabled is required")
+    private Boolean dailyAIReminder;
 
-    @NotNull(message = "Priority support enabled is required")
-    private Boolean prioritySupportEnabled;
+
 }

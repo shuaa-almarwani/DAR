@@ -32,9 +32,6 @@ public class SubscriptionPlan {
     private Boolean isPopular;
 
     @Column(nullable = false)
-    private Boolean contactSales;
-
-    @Column(nullable = false)
     private Integer maxHomes;
 
     @Column(nullable = false)
@@ -53,10 +50,7 @@ public class SubscriptionPlan {
     private Boolean weatherReminderEnabled;
 
     @Column(nullable = false)
-    private Boolean usageSpikeDetectionEnabled;
-
-    @Column(nullable = false)
-    private Boolean prioritySupportEnabled;
+    private Boolean dailyAIReminder;
 
 
     @OneToMany(mappedBy = "subscriptionPlan")
