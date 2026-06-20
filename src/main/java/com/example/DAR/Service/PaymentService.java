@@ -25,6 +25,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final ModelMapper modelMapper;
+    private final NotificationService notificationService;
 
     public List<PaymentDtoOut> getAllPayments() {
         List<Payment> payments = paymentRepository.findAll();
@@ -66,6 +67,10 @@ public void addPayment(Integer userSubscriptionId, PaymentDtoIn dto) {
     userSubscription.setStatus(UserSubscriptionStatus.ACTIVE);
     userSubscription.setPaymentStatus(PaymentStatus.PAID);
     userSubscriptionRepository.save(userSubscription);
+    notificationService.sendSubscriptionActivatedNotification(
+            userSubscription.getUser(),
+            userSubscription.getSubscriptionPlan().getName()
+    );
 }
 
     public void deletePayment(Integer id) {

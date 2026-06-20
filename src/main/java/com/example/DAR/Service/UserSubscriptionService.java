@@ -25,6 +25,7 @@ public class UserSubscriptionService {
     private final UserRepository userRepository;
     private final SubscriptionPlanRepository subscriptionPlanRepository;
     private final ModelMapper modelMapper;
+    private final NotificationService notificationService;
 
     public List<UserSubscriptionDtoOut> getAllUserSubscriptions() {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findAll();
@@ -62,6 +63,7 @@ public class UserSubscriptionService {
         userSubscription.setPaymentStatus(PaymentStatus.UNPAID);
 
         UserSubscription savedSubscription = userSubscriptionRepository.save(userSubscription);
+        notificationService.sendSubscriptionPendingPaymentNotification(user, plan.getName());
         return mapToDto(savedSubscription);
     }
 
