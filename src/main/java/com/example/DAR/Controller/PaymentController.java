@@ -16,20 +16,26 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping("/get")
-    public ResponseEntity getAllPayments() {
+    public ResponseEntity<?> getAllPayments() {
         return ResponseEntity.status(200).body(paymentService.getAllPayments());
     }
 
     @PostMapping("/add/{userSubscriptionId}")
-    public ResponseEntity addPayment(@PathVariable Integer userSubscriptionId,
+    public ResponseEntity<?> addPayment(@PathVariable Integer userSubscriptionId,
                                      @RequestBody @Valid PaymentDtoIn dto) {
         paymentService.addPayment(userSubscriptionId, dto);
         return ResponseEntity.status(200).body(new ApiResponse("Payment added successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deletePayment(@PathVariable Integer id) {
+    public ResponseEntity<?> deletePayment(@PathVariable Integer id) {
         paymentService.deletePayment(id);
         return ResponseEntity.status(200).body(new ApiResponse("Payment deleted successfully"));
+    }
+
+
+    @GetMapping("/get/user/{userId}")
+    public ResponseEntity<?> getAllPaymentsByUser(@PathVariable Integer userId) {
+        return ResponseEntity.status(200).body(paymentService.getAllPaymentsByUser(userId));
     }
 }

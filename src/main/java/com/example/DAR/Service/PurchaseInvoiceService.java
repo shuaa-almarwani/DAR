@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -112,5 +113,12 @@ public class PurchaseInvoiceService {
         } catch (Exception e) {
             throw new ApiException("Failed to parse AI response: " + e.getMessage());
         }
+
     }
+    public  Map<String, ? > countActiveWarranties(Integer homeId){
+        Home home = homeRepository.findHomeById(homeId);
+        if (home == null) throw new ApiException("home not found");
+        Long count = purchaseInvoiceRepository.countActiveWarrantiesByHomeId(homeId, LocalDate.now());
+       return Map.of("activeWarranties", count != null ? count : 0);
+ }
 }

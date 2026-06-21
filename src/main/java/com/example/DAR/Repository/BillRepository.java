@@ -20,6 +20,13 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
     List<Bill> findByHomeIdAndYearAndMonth(@Param("homeId") Integer homeId, @Param("year") int year, @Param("month") int month);
 
     List<Bill> findByDueDateBetweenAndStatus(LocalDate from, LocalDate to, String status);
+    List<Bill> findByHomeIdAndStatus(Integer homeId, String status);
+
+    @Query("SELECT SUM(b.amount) FROM Bill b WHERE b.home.id = :homeId AND b.type = :type AND YEAR(b.billMonth) = :year AND MONTH(b.billMonth) = :month")
+    Double sumAmountByHomeIdAndTypeAndMonth(@Param("homeId") Integer homeId, @Param("type") String type, @Param("year") int year, @Param("month") int month);
+
+    @Query("SELECT COUNT(b) FROM Bill b WHERE b.home.id = :homeId AND b.isAnomaly = true")
+    Long countAnomaliesByHomeId(@Param("homeId") Integer homeId);
 
     @Query("SELECT b FROM Bill b WHERE b.home.id = :homeId AND b.type = :type AND b.billMonth >= :from ORDER BY b.billMonth ASC")
     List<Bill> findByHomeIdAndTypeAndBillMonthAfter(@Param("homeId") Integer homeId, @Param("type") String type, @Param("from") LocalDate from);

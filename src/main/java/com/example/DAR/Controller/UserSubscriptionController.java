@@ -29,6 +29,12 @@ public class UserSubscriptionController {
         return ResponseEntity.status(200).body(new ApiResponse("User subscription deleted successfully"));
     }
 
+
+    @PostMapping("/upgrade/{userId}/{planId}")
+    public ResponseEntity<?> upgrade(@PathVariable Integer userId, @PathVariable Integer planId) {
+        return ResponseEntity.status(200).body(userSubscriptionService.upgradeUserSubscription(userId, planId));
+    }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserSubscriptionsByUserId(@PathVariable Integer userId) {
         return ResponseEntity.status(200).body(userSubscriptionService.getAllUserSubscriptionsByUserId(userId));

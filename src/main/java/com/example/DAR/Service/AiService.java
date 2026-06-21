@@ -119,7 +119,7 @@ public class AiService {
                     "billMonth (format YYYY-MM-DD, use first day of the month), " +
                     "consumption (integer), unit (string), amount (decimal, total amount due), " +
                     "isInstallment (boolean), totalInstallment (integer, 0 if none), " +
-                    "paidInstallment (integer, 0 if none), status (PENDING or PAID), imageUrl (empty string). " +
+                    "paidInstallment (integer, 0 if none), status (PENDING, PAID, or OVERDUE), imageUrl (empty string). " +
                     "Return raw JSON only, no explanation."
             );
 
@@ -197,6 +197,16 @@ public class AiService {
         }
     }
 
+    public String generateBillComparisonNote(String type, String monthlyData) {
+        String prompt = String.format(
+            "You are a smart home assistant. Analyze the following %s bill data over the past months and write a short note (2-3 sentences max) in English.\n\n" +
+            "Data (month: consumption, amount):\n%s\n\n" +
+            "Mention: the trend (increasing/decreasing/stable), the highest and lowest months, and one practical tip. No markdown, plain text only.",
+            type, monthlyData
+        );
+        return callClaudeApiText(prompt);
+    }
+
     public String generateMonthlyReportSummary(String homeAddress, int year, int month, String billsData, String purchasesData) {
         String prompt = String.format(
             "You are a smart home assistant for DAR platform. Write a concise monthly report in English for the home at: %s\n" +
@@ -249,6 +259,17 @@ public class AiService {
                 topic, tone, language
         );
         return callClaudeApi(prompt);
+    }
+
+    public String generateSensorReportSummary(String homeAddress, String sensorsData) {
+        String prompt = "You are a smart home analyst. Based on the sensor readings below for home at \"" + homeAddress + "\", " +
+                "write a concise report in English covering:\n" +
+                "1. Overall Sensor Status: how many active/inactive\n" +
+                "2. Notable Readings: any sensors with unusually high or low values\n" +
+                "3. Recommendations: what the homeowner should check or maintain\n\n" +
+                "Sensor Data:\n" + sensorsData + "\n\n" +
+                "Keep the report short (4-6 sentences), professional, and actionable.";
+        return callClaudeApiText(prompt);
     }
 
     public String generateHomeItemMaintenanceAdvice(HomeItem homeItem) {

@@ -53,6 +53,17 @@ public class BillController {
         return ResponseEntity.status(200).body(new ApiResponse("Bill marked as paid"));
     }
 
+    @PutMapping("/overdue/{id}")
+    public ResponseEntity<?> markAsOverdue(@PathVariable Integer id) {
+        billService.markAsOverdue(id);
+        return ResponseEntity.status(200).body(new ApiResponse("Bill marked as overdue"));
+    }
+
+    @GetMapping("/get/status/{homeId}/{status}")
+    public ResponseEntity<?> getBillsByStatus(@PathVariable Integer homeId, @PathVariable String status) {
+        return ResponseEntity.status(200).body(billService.getBillsByStatus(homeId, status));
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteBill(@PathVariable Integer id) {
         billService.deleteBill(id);
@@ -81,6 +92,7 @@ public class BillController {
         return ResponseEntity.status(200).body(billService.compareBills(homeId, type, months));
     }
 
+
     @GetMapping("/report/pdf/{homeId}/{year}/{month}")
     public ResponseEntity<byte[]> getMonthlyReportPdf(@PathVariable Integer homeId, @PathVariable int year, @PathVariable int month) {
         byte[] pdf = pdfReportService.generateMonthlyReport(homeId, year, month);
@@ -88,5 +100,26 @@ public class BillController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report-" + year + "-" + month + ".pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
+    }
+    // كهرباء الشهر
+    @GetMapping("/electricity/{homeId}")
+    public ResponseEntity<?> currentMonthElectricity(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(billService.currentMonthElectricity(homeId));
+    }
+
+    // مياه الشهر
+    @GetMapping("/water/{homeId}")
+    public ResponseEntity<?> currentMonthWater(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(billService.currentMonthWater(homeId));
+    }
+    @GetMapping("/gas/{homeId}")
+    public ResponseEntity<?> currentMonthGas(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(billService.currentMonthGas(homeId));
+    }
+    // تنبيهات استهلاك
+    @GetMapping("/anomalies-count/{homeId}")
+    public ResponseEntity<?> anomaliesCount(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(billService.anomaliesCount(homeId));
+
     }
 }

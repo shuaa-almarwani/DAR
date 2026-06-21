@@ -3,20 +3,21 @@ package com.example.DAR.Service;
 import com.example.DAR.Api.ApiException;
 import com.example.DAR.DTO.In.BillDtoIn;
 import com.example.DAR.DTO.Out.BillComparisonDtoOut;
+import com.example.DAR.DTO.Out.BillComparisonResponseDtoOut;
 import com.example.DAR.DTO.Out.BillDtoOut;
 import com.example.DAR.DTO.Out.BillMonthlyReportDtoOut;
-import com.example.DAR.DTO.Out.SensorDtoOut;
 import com.example.DAR.Model.Bill;
 import com.example.DAR.Model.Home;
-import com.example.DAR.Model.Sensor;
 import com.example.DAR.Repository.BillRepository;
 import com.example.DAR.Repository.HomeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -104,11 +105,24 @@ public class Billservice {
     // MARK AS PAID
     public void markAsPaid(Integer id) {
         Bill bill = billRepository.findBillById(id);
-        if (bill==null) {
-            throw new ApiException("bill not found");
-        }
+        if (bill == null) throw new ApiException("bill not found");
         bill.setStatus("PAID");
         billRepository.save(bill);
+    }
+
+    // MARK AS OVERDUE
+    public void markAsOverdue(Integer id) {
+        Bill bill = billRepository.findBillById(id);
+        if (bill == null) throw new ApiException("bill not found");
+        bill.setStatus("OVERDUE");
+        billRepository.save(bill);
+    }
+
+    // GET by Status
+    public List<BillDtoOut> getBillsByStatus(Integer homeId, String status) {
+        if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
+        return billRepository.findByHomeIdAndStatus(homeId, status.toUpperCase())
+                .stream().map(b -> modelMapper.map(b, BillDtoOut.class)).toList();
     }
 
     // UPLOAD IMAGE → AI extract → save Bill
@@ -141,16 +155,26 @@ public class Billservice {
     }
 
     // COMPARE BILLS
-    public List<BillComparisonDtoOut> compareBills(Integer homeId, String type, int months) {
+    public BillComparisonResponseDtoOut compareBills(Integer homeId, String type, int months) {
         if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
         LocalDate from = LocalDate.now().minusMonths(months).withDayOfMonth(1);
         List<Bill> bills = billRepository.findByHomeIdAndTypeAndBillMonthAfter(homeId, type.toUpperCase(), from);
-        return bills.stream()
+
+        List<BillComparisonDtoOut> data = bills.stream()
                 .map(b -> new BillComparisonDtoOut(
                         b.getBillMonth().getYear() + "-" + String.format("%02d", b.getBillMonth().getMonthValue()),
                         b.getConsumption(),
                         b.getAmount()))
                 .toList();
+
+        String monthlyData = data.stream()
+                .map(d -> d.getMonth() + ": " + d.getConsumption() + " units, " + d.getAmount() + " SAR")
+                .collect(java.util.stream.Collectors.joining("\n"));
+
+        String aiNote = data.size() < 2 ? "Not enough data to analyze trends." :
+                aiService.generateBillComparisonNote(type, monthlyData);
+
+        return new BillComparisonResponseDtoOut(type.toUpperCase(), data, aiNote);
     }
 
     // MONTHLY REPORT
@@ -159,7 +183,7 @@ public class Billservice {
         List<Bill> bills = billRepository.findByHomeIdAndYearAndMonth(homeId, year, month);
         Map<String, BillMonthlyReportDtoOut> reportMap = new java.util.LinkedHashMap<>();
         for (Bill b : bills) {
-            reportMap.computeIfAbsent(b.getType(), t -> new BillMonthlyReportDtoOut(t, 0, 0.0, 0));
+            reportMap.computeIfAbsent(b.getType(), t -> new BillMonthlyReportDtoOut(t, 0, 0.0, 0, null));
             BillMonthlyReportDtoOut r = reportMap.get(b.getType());
             r.setTotalConsumption(r.getTotalConsumption() + b.getConsumption());
             r.setTotalAmount(r.getTotalAmount() + (b.getAmount() != null ? b.getAmount() : 0));
@@ -182,4 +206,31 @@ public class Billservice {
         }
         billRepository.deleteById(id);
     }
+    public Map<String, ? > currentMonthElectricity(Integer homeId){
+        if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        Double amount = billRepository.sumAmountByHomeIdAndTypeAndMonth(homeId, "ELECTRICITY", year, month);
+        return Map.of("type", "ELECTRICITY", "amount", amount != null ? amount : 0.0, "period", year + "-" + String.format("%02d", month));
+    }
+    public Map<String, ? > currentMonthWater(Integer homeId){
+        if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        Double amount = billRepository.sumAmountByHomeIdAndTypeAndMonth(homeId, "WATER", year, month);
+        return Map.of("type", "WATER", "amount", amount != null ? amount : 0.0, "period", year + "-" + String.format("%02d", month));}
+
+    public Map<String, ? > currentMonthGas(Integer homeId){
+        if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
+        int year = LocalDate.now().getYear();
+        int month = LocalDate.now().getMonthValue();
+        Double amount = billRepository.sumAmountByHomeIdAndTypeAndMonth(homeId, "GAS", year, month);
+        return Map.of("type", "GAS", "amount", amount != null ? amount : 0.0, "period", year + "-" + String.format("%02d", month));}
+
+    public Map<String, ? > anomaliesCount(Integer homeId) {
+        if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
+        Long count = billRepository.countAnomaliesByHomeId(homeId);
+        return Map.of("anomaliesCount", count != null ? count : 0);
+    }
+
 }

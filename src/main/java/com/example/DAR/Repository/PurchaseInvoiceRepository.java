@@ -20,4 +20,7 @@ public interface PurchaseInvoiceRepository extends JpaRepository<PurchaseInvoice
     List<PurchaseInvoice> findTopPurchasesByHomeId(@Param("homeId") Integer homeId);
 
     List<PurchaseInvoice> findByWarrantyExpiryBetween(LocalDate from, LocalDate to);
+
+    @Query("SELECT COUNT(p) FROM PurchaseInvoice p WHERE p.home.id = :homeId AND p.warrantyExpiry >= :today")
+    Long countActiveWarrantiesByHomeId(@Param("homeId") Integer homeId, @Param("today") LocalDate today);
 }

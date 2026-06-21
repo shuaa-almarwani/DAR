@@ -2,10 +2,13 @@ package com.example.DAR.Controller;
 
 import com.example.DAR.Api.ApiResponse;
 import com.example.DAR.DTO.In.SensorReadingDtoIn;
+import com.example.DAR.Service.PdfReportService;
 import com.example.DAR.Service.Sensorreadingservice;
 import com.example.DAR.Service.WorkflowTriggerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +19,9 @@ public class SensorReadingController {
 
     private final Sensorreadingservice sensorReadingService;
     private final WorkflowTriggerService workflowTriggerService;
+    private final PdfReportService pdfReportService;
 
-    @PostMapping("/add/{sensorId}")
-    public ResponseEntity<?> addReading(@PathVariable Integer sensorId, @RequestBody @Valid SensorReadingDtoIn dto) {
-        sensorReadingService.addReading(sensorId, dto);
-        return ResponseEntity.status(200).body(new ApiResponse("Reading added successfully"));
-    }
+
 
     @GetMapping("/get/sensor/{sensorId}")
     public ResponseEntity<?> getAllReadingsBySensor(@PathVariable Integer sensorId) {
@@ -38,14 +38,24 @@ public class SensorReadingController {
         return ResponseEntity.status(200).body(sensorReadingService.getLatestReading(sensorId));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteReading(@PathVariable Integer id) {
-        sensorReadingService.deleteReading(id);
-        return ResponseEntity.status(200).body(new ApiResponse("Reading deleted successfully"));
-    }
+
 
     @GetMapping("/analyze/{sensorId}")
     public ResponseEntity<?> analyzeSensorReadings(@PathVariable Integer sensorId) {
         return ResponseEntity.status(200).body(workflowTriggerService.triggerSensorAnalysis(sensorId));
+    }
+
+    @GetMapping("/report/{homeId}")
+    public ResponseEntity<?> getSensorReport(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(sensorReadingService.getSensorReport(homeId));
+    }
+
+    @GetMapping("/report/{homeId}/pdf")
+    public ResponseEntity<byte[]> getSensorReportPdf(@PathVariable Integer homeId) {
+        byte[] pdf = pdfReportService.generateSensorReport(homeId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=sensor-report-home-" + homeId + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 }

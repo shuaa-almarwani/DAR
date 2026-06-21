@@ -40,38 +40,50 @@ public class PaymentService {
         return dtoOuts;
     }
 
-public void addPayment(Integer userSubscriptionId, PaymentDtoIn dto) {
 
-    UserSubscription userSubscription =
-            userSubscriptionRepository.findUserSubscriptionById(userSubscriptionId);
+    public void addPayment(Integer userSubscriptionId, PaymentDtoIn dto) {
 
-    if (userSubscription == null) {
-        throw new ApiException("User subscription not found");
+        UserSubscription userSubscription =
+                userSubscriptionRepository.findUserSubscriptionById(userSubscriptionId);
+
+        if (userSubscription == null) {
+            throw new ApiException("User subscription not found");
+        }
+
+        if (userSubscription.getPaymentStatus() != PaymentStatus.UNPAID) {
+            throw new ApiException("Subscription payment is not unpaid");
+        }
+
+        Payment payment = new Payment();
+
+        payment.setUserSubscription(userSubscription);
+        payment.setAmount(userSubscription.getSubscriptionPlan().getPrice());
+        payment.setPaymentMethod(dto.getPaymentMethod());
+        payment.setTransactionReference(dto.getTransactionReference());
+        payment.setPaymentDate(LocalDate.now());
+        payment.setStatus(PaymentStatus.PAID);
+
+        paymentRepository.save(payment);
+
+        List<UserSubscription> activeSubscriptions = userSubscriptionRepository.findOtherByUserAndStatus(
+                userSubscription.getUser().getId(),
+                UserSubscriptionStatus.ACTIVE,
+                userSubscription.getId()
+        );
+
+        for (UserSubscription activeSubscription : activeSubscriptions) {
+            activeSubscription.setStatus(UserSubscriptionStatus.CANCELLED);
+            userSubscriptionRepository.save(activeSubscription);
+        }
+
+        userSubscription.setStatus(UserSubscriptionStatus.ACTIVE);
+        userSubscription.setPaymentStatus(PaymentStatus.PAID);
+        userSubscriptionRepository.save(userSubscription);
+        notificationService.sendSubscriptionActivatedNotification(
+                userSubscription.getUser(),
+                userSubscription.getSubscriptionPlan().getName()
+        );
     }
-
-    if (userSubscription.getPaymentStatus() != PaymentStatus.UNPAID) {
-        throw new ApiException("Subscription payment is not unpaid");
-    }
-
-    Payment payment = new Payment();
-
-    payment.setUserSubscription(userSubscription);
-    payment.setAmount(userSubscription.getSubscriptionPlan().getPrice());
-    payment.setPaymentMethod(dto.getPaymentMethod());
-    payment.setTransactionReference(dto.getTransactionReference());
-    payment.setPaymentDate(LocalDate.now());
-    payment.setStatus(PaymentStatus.PAID);
-
-    paymentRepository.save(payment);
-
-    userSubscription.setStatus(UserSubscriptionStatus.ACTIVE);
-    userSubscription.setPaymentStatus(PaymentStatus.PAID);
-    userSubscriptionRepository.save(userSubscription);
-    notificationService.sendSubscriptionActivatedNotification(
-            userSubscription.getUser(),
-            userSubscription.getSubscriptionPlan().getName()
-    );
-}
 
     public void deletePayment(Integer id) {
         Payment payment = paymentRepository.findPaymentById(id);
@@ -83,4 +95,17 @@ public void addPayment(Integer userSubscriptionId, PaymentDtoIn dto) {
         paymentRepository.delete(payment);
     }
 
+
+    public List<PaymentDtoOut> getAllPaymentsByUser(Integer userId) {
+        List<Payment> payments = paymentRepository.findByUser(userId);
+        List<PaymentDtoOut> dtoOuts = new ArrayList<>();
+
+        for (Payment payment : payments) {
+            PaymentDtoOut dto = modelMapper.map(payment, PaymentDtoOut.class);
+            dto.setUserSubscriptionId(payment.getUserSubscription().getId());
+            dtoOuts.add(dto);
+        }
+
+        return dtoOuts;
+    }
 }

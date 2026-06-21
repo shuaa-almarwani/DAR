@@ -3,6 +3,7 @@ package com.example.DAR.Controller;
 import com.example.DAR.Api.ApiResponse;
 import com.example.DAR.DTO.In.SensorDtoIn;
 import com.example.DAR.Service.SensorService;
+import com.example.DAR.Service.WorkflowTriggerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class SensorController {
 
     private final SensorService sensorService;
+    private  final WorkflowTriggerService workflowTriggerService ;
 
     @PostMapping("/add/{homeId}")
     public ResponseEntity<?> addSensor(@PathVariable Integer homeId, @RequestBody @Valid SensorDtoIn dto) {
@@ -27,10 +29,17 @@ public class SensorController {
         return ResponseEntity.status(200).body(new ApiResponse("Sensor updated successfully"));
     }
 
-    @PutMapping("/toggle/{id}")
-    public ResponseEntity<?> toggleActive(@PathVariable Integer id) {
+    @PutMapping("/connect/{id}")
+    public ResponseEntity<?> sensorConnection(@PathVariable Integer id) {
+        workflowTriggerService.connectSensor(id);
         sensorService.toggleActive(id);
-        return ResponseEntity.status(200).body(new ApiResponse("Sensor status toggled"));
+        return ResponseEntity.status(200).body(new ApiResponse("Sensor has been connected"));
+    }
+    @PutMapping("/disconnect/{id}")
+    public ResponseEntity<?> sensorDisconnect(@PathVariable Integer id) {
+       // workflowTriggerService.connectSensor(id);
+        sensorService.toggleDeactivate(id);
+        return ResponseEntity.status(200).body(new ApiResponse("Sensor has been disconnect"));
     }
 
     @DeleteMapping("/delete/{id}")

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RequestMapping("/api/v1/user")
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +22,18 @@ public class UserController {
         return ResponseEntity.status(200).body(userService.getAllUsers());
     }
 
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody @Valid UserDtoIn dto) {
+        userService.addUser(dto);
+        return ResponseEntity.status(200).body(new ApiResponse("User registered successfully"));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+        String token = userService.login(body.get("username"), body.get("password"));
+        return ResponseEntity.ok(Map.of("token", token));
+    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody @Valid UserDtoIn dto) {

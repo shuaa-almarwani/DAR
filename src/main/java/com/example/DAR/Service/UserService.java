@@ -5,8 +5,10 @@ import com.example.DAR.DTO.In.UserDtoIn;
 import com.example.DAR.DTO.Out.UserDtoOut;
 import com.example.DAR.Model.User;
 import com.example.DAR.Repository.UserRepository;
+import com.example.DAR.Security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,8 +20,18 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-private final NotificationService notificationService;
+    private final NotificationService notificationService;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
+
+    public String login(String username, String password) {
+        User user = userRepository.findUserByUsername(username);
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+            throw new ApiException("Invalid username or password");
+        }
+        return jwtUtil.generateToken(user.getUsername());
+    }
 
     public List<UserDtoOut> getAllUsers() {
 
@@ -46,6 +58,8 @@ private final NotificationService notificationService;
         User user = modelMapper.map(dto, User.class);
         user.setAiCounter(0);
         user.setCreateAt(LocalDate.now());
+        user.setRole("USER");
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         userRepository.save(user);
         notificationService.sendWelcomeNotification(user.getId());

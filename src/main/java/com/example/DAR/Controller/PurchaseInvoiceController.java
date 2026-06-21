@@ -58,4 +58,11 @@ public class PurchaseInvoiceController {
     public ResponseEntity<?> getStats(@PathVariable Integer homeId) {
         return ResponseEntity.status(200).body(purchaseInvoiceService.getStatsByHome(homeId));
     }
+
+    // ضمانات سارية
+    @GetMapping("/active-warranties/{homeId}")
+    public ResponseEntity<?> activeWarranties(@PathVariable Integer homeId) {
+        return ResponseEntity.status(200).body(purchaseInvoiceService.countActiveWarranties(homeId));
+
+    }
 }

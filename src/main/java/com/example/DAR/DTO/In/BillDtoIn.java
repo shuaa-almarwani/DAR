@@ -46,8 +46,8 @@ public class BillDtoIn {
     @Min(value = 0, message = "Paid installments cannot be negative")
     private Integer paidInstallment;
 
-    @NotNull(message = "Status is required")
-    private String status; // مدري مطلوب او لا في البدايه
+    @Pattern(regexp = "(?i)^(PENDING|PAID|OVERDUE)$", message = "Status must be PENDING, PAID, or OVERDUE")
+    private String status;
 
     private LocalDate dueDate;
 

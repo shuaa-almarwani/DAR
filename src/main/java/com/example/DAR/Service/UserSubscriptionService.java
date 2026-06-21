@@ -87,6 +87,59 @@ public class UserSubscriptionService {
         userSubscriptionRepository.delete(subscription);
     }
 
+
+
+    public UserSubscriptionDtoOut upgradeUserSubscription(Integer userId, Integer planId) {
+
+        User user = userRepository.findUserById(userId);
+
+        if (user == null) {
+            throw new ApiException("User not found");
+        }
+
+        SubscriptionPlan plan = subscriptionPlanRepository.findSubscriptionPlanById(planId);
+
+        if (plan == null) {
+            throw new ApiException("Subscription plan not found");
+        }
+
+        UserSubscription activeSubscription = userSubscriptionRepository.findUserSubscriptionByUserIdAndStatus(userId, UserSubscriptionStatus.ACTIVE);
+
+        if (activeSubscription == null) {
+            throw new ApiException("Active subscription not found");
+        }
+
+        if (activeSubscription.getSubscriptionPlan().getId().equals(planId)) {
+            throw new ApiException("User is already subscribed to this plan");
+        }
+
+        UserSubscription newSubscription = new UserSubscription();
+        newSubscription.setUser(user);
+        newSubscription.setSubscriptionPlan(plan);
+        newSubscription.setStartDate(LocalDate.now());
+        newSubscription.setEndDate(LocalDate.now().plusDays(29));
+
+        if (plan.getPrice() == 0) {
+            activeSubscription.setStatus(UserSubscriptionStatus.CANCELLED);
+            userSubscriptionRepository.save(activeSubscription);
+            newSubscription.setStatus(UserSubscriptionStatus.ACTIVE);
+            newSubscription.setPaymentStatus(PaymentStatus.PAID);
+        } else {
+            newSubscription.setStatus(UserSubscriptionStatus.PENDING);
+            newSubscription.setPaymentStatus(PaymentStatus.UNPAID);
+        }
+
+        UserSubscription savedSubscription = userSubscriptionRepository.save(newSubscription);
+
+        if (plan.getPrice() == 0) {
+            notificationService.sendSubscriptionActivatedNotification(user, plan.getName());
+        } else {
+            notificationService.sendSubscriptionPendingPaymentNotification(user, plan.getName());
+        }
+
+        return mapToDto(savedSubscription);
+    }
+
     public List<UserSubscriptionDtoOut> getAllUserSubscriptionsByUserId(Integer userId) {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findUserSubscriptionsByUserId(userId);
         List<UserSubscriptionDtoOut> dtoOuts = new ArrayList<>();

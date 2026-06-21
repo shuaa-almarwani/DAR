@@ -54,11 +54,31 @@ public class SensorService {
          sensorRepository.save(existing);
     }
 
-    // TOGGLE ACTIVE
+    // TOGGLE Sensor to ACTIVE
     public void toggleActive(Integer id) {
         Sensor sensor = sensorRepository.findSensorById(id);
-        sensor.setIsActive(!sensor.getIsActive());
+        if (sensor==null) {
+            throw new ApiException("sensor not found");
+        }
+        if (sensor.getIsActive()){
+            throw new ApiException("sensor is active ");
+        }
+        sensor.setIsActive(true);
+        sensor.setIsRunning(true);
          sensorRepository.save(sensor);
+    }
+    // TOGGLE Sensor to NOT ACTIVE
+    public void toggleDeactivate(Integer id) {
+        Sensor sensor = sensorRepository.findSensorById(id);
+        if (sensor==null) {
+            throw new ApiException("sensor not found");
+        }
+        if (!sensor.getIsActive()){
+            throw new ApiException("sensor is not active ");
+        }
+        sensor.setIsRunning(false);
+        sensor.setIsActive(false);
+        sensorRepository.save(sensor);
     }
 
     // DELETE

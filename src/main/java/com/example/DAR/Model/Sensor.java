@@ -33,6 +33,9 @@ public class Sensor {
     private String  serialNumber;
 
     private String imageUrl;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isRunning = false;
     @ManyToOne
     @JoinColumn(name = "home_id")
     private Home home;

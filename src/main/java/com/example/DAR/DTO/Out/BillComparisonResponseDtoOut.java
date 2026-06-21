@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BillMonthlyReportDtoOut {
+public class BillComparisonResponseDtoOut {
     private String type;
-    private Integer totalConsumption;
-    private Double totalAmount;
-    private Integer billCount;
-    private String status;
+    private List<BillComparisonDtoOut> data;
+    private String aiNote;
 }

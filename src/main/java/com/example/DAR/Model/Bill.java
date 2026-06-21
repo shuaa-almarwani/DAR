@@ -42,7 +42,7 @@ public class Bill {
     @Column(nullable = false)
     private Integer paidInstallment;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) CHECK (status IN ('PENDING','PAID','OVERDUE'))")
     private String status;
 
 

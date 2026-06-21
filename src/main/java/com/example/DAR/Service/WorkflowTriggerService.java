@@ -31,5 +31,21 @@ public class WorkflowTriggerService {
             throw new ApiException("Failed to analyze sensor readings: " + e.getMessage());
         }
     }
+    @Value("${n8n.webhook.sensor-connection}")
+    private String sensorConnectionUrl;
+    public String connectSensor (Integer sensorId){
+        try {
+            restClient.get()
+                    .uri(sensorConnectionUrl + "?sensorId=" + sensorId)
+                    .retrieve()
+                    .body(Map.class);
+
+
+
+        } catch (Exception e) {
+            throw new ApiException("Failed to connect sensor : " + e.getMessage());
+        }
+        return "";
+    }
 
 }
