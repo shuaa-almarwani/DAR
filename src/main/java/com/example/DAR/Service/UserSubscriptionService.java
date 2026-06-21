@@ -59,11 +59,20 @@ public class UserSubscriptionService {
         userSubscription.setStartDate(LocalDate.now());
         userSubscription.setEndDate(LocalDate.now().plusDays(29));
 
-        userSubscription.setStatus(UserSubscriptionStatus.PENDING);
-        userSubscription.setPaymentStatus(PaymentStatus.UNPAID);
+        if (plan.getPrice() == 0) {
+            userSubscription.setStatus(UserSubscriptionStatus.ACTIVE);
+            userSubscription.setPaymentStatus(PaymentStatus.PAID);
+        } else {
+            userSubscription.setStatus(UserSubscriptionStatus.PENDING);
+            userSubscription.setPaymentStatus(PaymentStatus.UNPAID);
+        }
 
         UserSubscription savedSubscription = userSubscriptionRepository.save(userSubscription);
-        notificationService.sendSubscriptionPendingPaymentNotification(user, plan.getName());
+        if (plan.getPrice() == 0) {
+            notificationService.sendSubscriptionActivatedNotification(user, plan.getName());
+        } else {
+            notificationService.sendSubscriptionPendingPaymentNotification(user, plan.getName());
+        }
         return mapToDto(savedSubscription);
     }
 
