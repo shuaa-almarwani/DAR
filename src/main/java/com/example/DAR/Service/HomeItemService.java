@@ -212,6 +212,13 @@ public class HomeItemService {
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
+        UserSubscription subscription = userSubscriptionRepository.findUserSubscriptionByUserIdAndStatus(homeItem.getHome().getUser().getId(), UserSubscriptionStatus.ACTIVE);
+        if (subscription == null) {
+            throw new ApiException("Active subscription not found");
+        }
+        if (subscription.getSubscriptionPlan().getMaxAiReportsPerMonth() <= 0) {
+            throw new ApiException("AI features are not available in your subscription plan");
+        }
 
         String advice = aiService.generateHomeItemMaintenanceAdvice(homeItem);
         List<String> adviceList = Arrays.stream(advice.split("\\n"))
@@ -227,6 +234,13 @@ public class HomeItemService {
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
+        UserSubscription subscription = userSubscriptionRepository.findUserSubscriptionByUserIdAndStatus(homeItem.getHome().getUser().getId(), UserSubscriptionStatus.ACTIVE);
+        if (subscription == null) {
+            throw new ApiException("Active subscription not found");
+        }
+        if (subscription.getSubscriptionPlan().getMaxAiReportsPerMonth() <= 0) {
+            throw new ApiException("AI features are not available in your subscription plan");
+        }
 
         String advice = aiService.generateHomeItemTroubleshootingSteps(homeItem, troubleshootingDTOIn.getIssueDescription());
         List<String> adviceList = Arrays.stream(advice.split("\\n"))
@@ -241,6 +255,13 @@ public class HomeItemService {
         HomeItem homeItem = homeItemRepository.findHomeItemById(itemId);
         if (homeItem == null) {
             throw new ApiException("Home item not found");
+        }
+        UserSubscription subscription = userSubscriptionRepository.findUserSubscriptionByUserIdAndStatus(homeItem.getHome().getUser().getId(), UserSubscriptionStatus.ACTIVE);
+        if (subscription == null) {
+            throw new ApiException("Active subscription not found");
+        }
+        if (subscription.getSubscriptionPlan().getMaxAiReportsPerMonth() <= 0) {
+            throw new ApiException("AI features are not available in your subscription plan");
         }
 
         Home home = homeItem.getHome();
