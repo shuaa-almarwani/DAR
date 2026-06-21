@@ -68,6 +68,9 @@ public class HomeService {
         if (user == null) {
             throw new ApiException("User not found");
         }
+        if (!home.getUser().getId().equals(userId)) {
+            throw new ApiException("You do not own this home");
+        }
         home.setName(homeDTOIn.getName());
         home.setAddress(homeDTOIn.getAddress());
         home.setLatitude(homeDTOIn.getLatitude());

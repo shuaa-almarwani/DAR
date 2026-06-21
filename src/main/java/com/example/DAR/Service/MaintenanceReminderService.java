@@ -134,6 +134,13 @@ reminder.setCreatedAt(LocalDate.now());
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
+        if (!reminder.getHome().getId().equals(home_id)) {
+            throw new ApiException("Reminder does not belong to this home");
+        }
+
+        if (!homeItem.getHome().getId().equals(home_id)) {
+            throw new ApiException("Home item does not belong to this home");
+        }
         reminder.setTitle(maintenanceReminderDTOIn.getTitle());
         reminder.setMessage(maintenanceReminderDTOIn.getMessage());
         reminder.setReminderDate(maintenanceReminderDTOIn.getReminderDate());

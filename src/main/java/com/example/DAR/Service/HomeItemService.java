@@ -83,6 +83,9 @@ public class HomeItemService {
         if (home == null) {
             throw new ApiException("Home not found");
         }
+        if (!homeItem.getHome().getId().equals(homeId)) {
+            throw new ApiException("Home item does not belong to this home");
+        }
         homeItem.setName(homeItemDTOIn.getName());
         homeItem.setCategory(homeItemDTOIn.getCategory());
         homeItem.setCustomCategory(homeItemDTOIn.getCustomCategory());

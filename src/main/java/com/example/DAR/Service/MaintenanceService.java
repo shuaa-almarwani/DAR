@@ -71,6 +71,9 @@ public class MaintenanceService {
         if (homeItem == null) {
             throw new ApiException("Home item not found");
         }
+        if (!homeItem.getHome().getId().equals(homeId)) {
+            throw new ApiException("Home item does not belong to this home");
+        }
         Maintenance maintenance = new Maintenance();
         maintenance.setTitle(maintenanceDTOIn.getTitle());
         maintenance.setDescription(maintenanceDTOIn.getDescription());
@@ -96,6 +99,13 @@ public class MaintenanceService {
         HomeItem homeItem = homeItemRepository.findHomeItemById(homeItemId);
         if (homeItem == null) {
             throw new ApiException("Home item not found");
+        }
+        if (!maintenance.getHome().getId().equals(homeId)) {
+            throw new ApiException("Maintenance does not belong to this home");
+        }
+
+        if (!homeItem.getHome().getId().equals(homeId)) {
+            throw new ApiException("Home item does not belong to this home");
         }
         maintenance.setTitle(maintenanceDTOIn.getTitle());
         maintenance.setDescription(maintenanceDTOIn.getDescription());
