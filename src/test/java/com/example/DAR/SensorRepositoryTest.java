@@ -39,6 +39,7 @@ public class SensorRepositoryTest {
         user.setUsername("shahad123");
         user.setPassword("password123");
         user.setPhoneNumber("0501234567");
+        user.setRole("USER");
 
         home = new Home();
         home.setId(1);

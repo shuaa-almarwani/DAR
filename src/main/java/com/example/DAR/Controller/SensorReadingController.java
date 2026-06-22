@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,16 +25,19 @@ public class SensorReadingController {
 
 
     @GetMapping("/get/sensor/{sensorId}")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUserSensor(#sensorId)")
     public ResponseEntity<?> getAllReadingsBySensor(@PathVariable Integer sensorId) {
         return ResponseEntity.status(200).body(sensorReadingService.getAllReadingsBySensor(sensorId));
     }
 
     @GetMapping("/get/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUserSensorReading(#id)")
     public ResponseEntity<?> getReadingById(@PathVariable Integer id) {
         return ResponseEntity.status(200).body(sensorReadingService.getReadingById(id));
     }
 
     @GetMapping("/get/latest/{sensorId}")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUserSensor(#sensorId)")
     public ResponseEntity<?> getLatestReading(@PathVariable Integer sensorId) {
         return ResponseEntity.status(200).body(sensorReadingService.getLatestReading(sensorId));
     }
@@ -41,16 +45,19 @@ public class SensorReadingController {
 
 
     @GetMapping("/analyze/{sensorId}")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUserSensor(#sensorId)")
     public ResponseEntity<?> analyzeSensorReadings(@PathVariable Integer sensorId) {
         return ResponseEntity.status(200).body(workflowTriggerService.triggerSensorAnalysis(sensorId));
     }
 
     @GetMapping("/report/{homeId}")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUserHome(#homeId)")
     public ResponseEntity<?> getSensorReport(@PathVariable Integer homeId) {
         return ResponseEntity.status(200).body(sensorReadingService.getSensorReport(homeId));
     }
 
     @GetMapping("/report/{homeId}/pdf")
+    @PreAuthorize("hasRole('ADMIN') or @securityService.isCurrentUserHome(#homeId)")
     public ResponseEntity<byte[]> getSensorReportPdf(@PathVariable Integer homeId) {
         byte[] pdf = pdfReportService.generateSensorReport(homeId);
         return ResponseEntity.ok()

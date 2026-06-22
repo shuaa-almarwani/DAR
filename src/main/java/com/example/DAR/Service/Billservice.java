@@ -45,6 +45,7 @@ public class Billservice {
         checkAndFlagAnomaly(bill, home);
     }
 
+    // Flags unusually high consumption by comparing it with the latest bills of the same type.
     private void checkAndFlagAnomaly(Bill bill, Home home) {
         List<Bill> previous = billRepository.findTop3ByHomeIdAndTypeOrderByBillMonthDesc(home.getId(), bill.getType());
         previous = previous.stream().filter(b -> !b.getId().equals(bill.getId())).toList();
@@ -126,6 +127,7 @@ public class Billservice {
     }
 
     // UPLOAD IMAGE → AI extract → save Bill
+    // Uses AI image extraction, then saves the bill as a normal bill record.
     public BillDtoOut addBillFromImage(Integer homeId, MultipartFile file) {
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) throw new ApiException("home not found");
@@ -155,6 +157,7 @@ public class Billservice {
     }
 
     // COMPARE BILLS
+    // Builds a monthly comparison and asks AI for a short explanation.
     public BillComparisonResponseDtoOut compareBills(Integer homeId, String type, int months) {
         if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
         LocalDate from = LocalDate.now().minusMonths(months).withDayOfMonth(1);
@@ -227,6 +230,7 @@ public class Billservice {
         Double amount = billRepository.sumAmountByHomeIdAndTypeAndMonth(homeId, "GAS", year, month);
         return Map.of("type", "GAS", "amount", amount != null ? amount : 0.0, "period", year + "-" + String.format("%02d", month));}
 
+    // Returns the number of anomaly bills for dashboard alerts.
     public Map<String, ? > anomaliesCount(Integer homeId) {
         if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
         Long count = billRepository.countAnomaliesByHomeId(homeId);

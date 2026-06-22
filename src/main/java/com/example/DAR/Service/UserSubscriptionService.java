@@ -38,6 +38,7 @@ public class UserSubscriptionService {
         return dtoOuts;
     }
 
+    // Creates a pending subscription; dates are set later after payment.
     public UserSubscriptionDtoOut createUserSubscription(Integer userId, Integer planId) {
 
         User user = userRepository.findUserById(userId);
@@ -86,6 +87,7 @@ public class UserSubscriptionService {
 
 
 
+    // Creates a pending upgrade while keeping the current plan active until payment.
     public UserSubscriptionDtoOut upgradeUserSubscription(Integer userId, Integer planId) {
 
         User user = userRepository.findUserById(userId);
@@ -136,6 +138,7 @@ public class UserSubscriptionService {
         return dtoOuts;
     }
 
+    // Marks active subscriptions as expired when their end date has passed.
     public void expireOutdatedSubscriptions() {
         List<UserSubscription> subscriptions = userSubscriptionRepository.findExpired(UserSubscriptionStatus.ACTIVE, LocalDate.now());
 

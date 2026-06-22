@@ -133,6 +133,7 @@ public class SubscriptionBusinessServiceTest {
         user.setUsername("samya");
         user.setPassword("password");
         user.setPhoneNumber("0500000000");
+        user.setRole("USER");
         user.setCreateAt(LocalDate.now());
         user.setAiCounter(0);
         return user;

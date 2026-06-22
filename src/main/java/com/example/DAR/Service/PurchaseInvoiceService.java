@@ -70,6 +70,7 @@ public class PurchaseInvoiceService {
         return invoices.stream().map(invoice -> modelMapper.map(invoice, PurchaseInvoiceDtoOut.class)).toList();
     }
     // STATS by Home
+    // Groups purchases by category for spending statistics.
     public PurchaseInvoiceStatsDtoOut getStatsByHome(Integer homeId) {
         if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
 
@@ -90,6 +91,7 @@ public class PurchaseInvoiceService {
     }
 
     // UPLOAD IMAGE → AI extract → save Invoice
+    // Uses AI image extraction, then saves the invoice normally.
     public PurchaseInvoiceDtoOut addInvoiceFromImage(Integer homeId, MultipartFile file) {
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) throw new ApiException("home not found");
@@ -115,6 +117,7 @@ public class PurchaseInvoiceService {
         }
 
     }
+    // Counts warranties that have not expired yet.
     public  Map<String, ? > countActiveWarranties(Integer homeId){
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) throw new ApiException("home not found");

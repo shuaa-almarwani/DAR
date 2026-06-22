@@ -41,6 +41,7 @@ public class PaymentService {
     }
 
 
+    // Confirms an unpaid subscription payment and activates the subscription.
     public void addPayment(Integer userSubscriptionId, PaymentDtoIn dto) {
 
         UserSubscription userSubscription =

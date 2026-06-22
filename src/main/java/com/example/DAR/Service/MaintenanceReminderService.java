@@ -37,7 +37,7 @@ public class MaintenanceReminderService {
 
     @Value("${twilio.voice.twiml-url}")
     private String twimlUrl;
-    ////
+    /// /
 
     private final MaintenanceReminderRepository maintenanceReminderRepository;
     private final HomeRepository homeRepository;
@@ -87,6 +87,7 @@ public class MaintenanceReminderService {
         return reminders.stream().map(m -> modelMapper.map(m, MaintenanceReminderDTOOut.class)).toList();
     }
 
+    // Creates a reminder from a maintenance task and lets AI improve the message when possible.
     public void addMaintenanceReminder(Integer maintenanceId, MaintenanceReminderDTOIn dto) {
 
         Maintenance maintenance = maintenanceRepository.findMaintenanceById(maintenanceId);
@@ -115,12 +116,13 @@ public class MaintenanceReminderService {
         reminder.setReminderDate(dto.getReminderDate());
         reminder.setSeason(dto.getSeason());
         reminder.setWeatherCondition(dto.getWeatherCondition());
-reminder.setCreatedAt(LocalDate.now());
+        reminder.setCreatedAt(LocalDate.now());
         reminder.setIsSent(false);
         reminder.setNotificationMethod(dto.getNotificationMethod());
 
         maintenanceReminderRepository.save(reminder);
     }
+
     public void updateMaintenanceReminder(Integer id, Integer home_id, Integer homeItem_id, MaintenanceReminderDTOIn maintenanceReminderDTOIn) {
         MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(id);
         if (reminder == null) {
@@ -210,6 +212,7 @@ reminder.setCreatedAt(LocalDate.now());
                 .toList();
     }
 
+    // Sends the reminder using the selected method, then marks it as sent.
     public void sendReminder(Integer reminderId) {
 
         MaintenanceReminder reminder =
@@ -257,10 +260,12 @@ reminder.setCreatedAt(LocalDate.now());
         // شيلي التعليق قبل العرض
         maintenanceReminderRepository.save(reminder);
     }
-//    @Scheduled(cron = "0 0 8 * * *")
+
+    //@Scheduled(cron = "0 0 8 * * *")
     @Scheduled(cron = " 0 * * * * *")
     // للتجربة بينرسل كل دقيقة
 
+    // Scheduler that sends today's unsent reminders automatically.
     public void sendTodayRemindersAutomatically() {
 
         LocalDate today = LocalDate.now();
@@ -277,41 +282,45 @@ reminder.setCreatedAt(LocalDate.now());
             }
         }
     }
-// helper method to send
-private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
 
-    if (user.getEmail() == null || user.getEmail().isEmpty()) {
-        throw new ApiException("User email not found");
+    // helper method to send
+    // Builds and sends the reminder email.
+    private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
+
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new ApiException("User email not found");
+        }
+
+        try {
+            String subject = "تذكير صيانة من دار";
+
+            String priorityBadge = getPriorityBadge(reminder.getMaintenance().getPriority());
+
+            String message =
+                    priorityBadge +
+                            "<br>" +
+                            "مرحبًا " + user.getName() + "،<br><br>" +
+                            "لديك تذكير صيانة:<br>" +
+                            "<b>" + reminder.getTitle() + "</b><br><br>" +
+                            reminder.getMessage() + "<br><br>" +
+                            "تاريخ التذكير: " + reminder.getReminderDate();
+
+            String htmlMessage =
+                    notificationService.buildEmailTemplate(subject, message);
+
+            emailService.sendEmail(
+                    user.getEmail(),
+                    subject,
+                    htmlMessage
+            );
+
+        } catch (Exception e) {
+            System.out.println("Email reminder not sent: " + e.getMessage());
+            throw new ApiException("Email reminder not sent");
+        }
     }
 
-    try {
-        String subject = "تذكير صيانة من دار";
-
-        String priorityBadge = getPriorityBadge(reminder.getMaintenance().getPriority());
-
-        String message =
-                priorityBadge +
-                        "<br>" +
-                        "مرحبًا " + user.getName() + "،<br><br>" +
-                        "لديك تذكير صيانة:<br>" +
-                        "<b>" + reminder.getTitle() + "</b><br><br>" +
-                        reminder.getMessage() + "<br><br>" +
-                        "تاريخ التذكير: " + reminder.getReminderDate();
-
-        String htmlMessage =
-                notificationService.buildEmailTemplate(subject, message);
-
-        emailService.sendEmail(
-                user.getEmail(),
-                subject,
-                htmlMessage
-        );
-
-    } catch (Exception e) {
-        System.out.println("Email reminder not sent: " + e.getMessage());
-        throw new ApiException("Email reminder not sent");
-    }
-}
+    // Builds and sends the reminder WhatsApp message.
     private void sendReminderByWhatsapp(User user, MaintenanceReminder reminder) {
 
         if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
@@ -339,6 +348,7 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
             throw new ApiException("WhatsApp reminder not sent");
         }
     }
+
     // helper method to sendReminderByWhatsapp
     private String getPriorityText(String priority) {
 
@@ -354,6 +364,8 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
             default -> "الأولوية: غير محددة";
         };
     }
+
+    // Starts a Twilio voice call for urgent reminders.
     private void callUserForReminder(User user, MaintenanceReminder reminder) {
 
         if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
@@ -382,6 +394,7 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
 
         System.out.println("Maintenance reminder call started. SID: " + call.getSid());
     }
+
     public void reactivateReminder(Integer reminderId) {
 
         MaintenanceReminder reminder = maintenanceReminderRepository.findMaintenanceReminderById(reminderId);
@@ -395,6 +408,7 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
         maintenanceReminderRepository.save(reminder);
     }
 
+    // Counts sent, unsent, today, and upcoming reminders for a home.
     public MaintenanceReminderSummaryDTOOut getReminderSummary(Integer homeId) {
 
         Home home = homeRepository.findHomeById(homeId);
@@ -438,6 +452,7 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
 
     // weather and ai
     // #1
+    // Generates short maintenance advice based on current city weather.
     public String getAIWeatherMaintenanceAdvice(Integer homeId) {
 
         Home home = homeRepository.findHomeById(homeId);
@@ -449,24 +464,24 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
         String weatherDescription = weatherService.getWeatherDescription(home.getCity());
 
         String prompt = """
-            You are an AI assistant for a smart Arabic home maintenance platform called DAR.
-
-            The platform does not perform maintenance.
-            It only gives reminders and suggestions to help the user take care of the home.
-
-            Based on this weather information:
-            %s
-
-            Give a short Arabic maintenance advice for the homeowner.
-            The advice should be related to home maintenance reminders only.
-            Examples:
-            - AC filter cleaning in hot weather
-            - water heater check in cold weather
-            - humidity or leakage check in rainy/humid weather
-
-            Return the answer in Arabic only.
-            Keep it short and user-friendly.
-            """.formatted(weatherDescription);
+                You are an AI assistant for a smart Arabic home maintenance platform called DAR.
+                
+                The platform does not perform maintenance.
+                It only gives reminders and suggestions to help the user take care of the home.
+                
+                Based on this weather information:
+                %s
+                
+                Give a short Arabic maintenance advice for the homeowner.
+                The advice should be related to home maintenance reminders only.
+                Examples:
+                - AC filter cleaning in hot weather
+                - water heater check in cold weather
+                - humidity or leakage check in rainy/humid weather
+                
+                Return the answer in Arabic only.
+                Keep it short and user-friendly.
+                """.formatted(weatherDescription);
 
         return openAIService.generateReaderAnalysis(prompt);
     }
@@ -476,89 +491,6 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
 
         if (priority == null) {
             return """
-                <div style="
-                    display:inline-block;
-                    background-color:#F1DCD2;
-                    color:#4A2F25;
-                    padding:6px 14px;
-                    border-radius:999px;
-                    font-size:13px;
-                    font-weight:bold;
-                    margin-bottom:10px;
-                ">
-                    أولوية غير محددة
-                </div>
-                """;
-        }
-
-        switch (priority.toUpperCase()) {
-
-            case "URGENT":
-                return """
-                    <div style="
-                        display:inline-block;
-                        background-color:#FDE2E2;
-                        color:#8A1F1F;
-                        padding:6px 14px;
-                        border-radius:999px;
-                        font-size:13px;
-                        font-weight:bold;
-                        margin-bottom:10px;
-                    ">
-                        أولوية عاجلة
-                    </div>
-                    """;
-
-            case "HIGH":
-                return """
-                    <div style="
-                        display:inline-block;
-                        background-color:#FFE8CC;
-                        color:#8A4B00;
-                        padding:6px 14px;
-                        border-radius:999px;
-                        font-size:13px;
-                        font-weight:bold;
-                        margin-bottom:10px;
-                    ">
-                        أولوية عالية
-                    </div>
-                    """;
-
-            case "MEDIUM":
-                return """
-                    <div style="
-                        display:inline-block;
-                        background-color:#F1DCD2;
-                        color:#4A2F25;
-                        padding:6px 14px;
-                        border-radius:999px;
-                        font-size:13px;
-                        font-weight:bold;
-                        margin-bottom:10px;
-                    ">
-                        أولوية متوسطة
-                    </div>
-                    """;
-
-            case "LOW":
-                return """
-                    <div style="
-                        display:inline-block;
-                        background-color:#E6F4EA;
-                        color:#1E6B3A;
-                        padding:6px 14px;
-                        border-radius:999px;
-                        font-size:13px;
-                        font-weight:bold;
-                        margin-bottom:10px;
-                    ">
-                        أولوية منخفضة
-                    </div>
-                    """;
-
-            default:
-                return """
                     <div style="
                         display:inline-block;
                         background-color:#F1DCD2;
@@ -573,34 +505,119 @@ private void sendReminderByEmail(User user, MaintenanceReminder reminder) {
                     </div>
                     """;
         }
+
+        switch (priority.toUpperCase()) {
+
+            case "URGENT":
+                return """
+                        <div style="
+                            display:inline-block;
+                            background-color:#FDE2E2;
+                            color:#8A1F1F;
+                            padding:6px 14px;
+                            border-radius:999px;
+                            font-size:13px;
+                            font-weight:bold;
+                            margin-bottom:10px;
+                        ">
+                            أولوية عاجلة
+                        </div>
+                        """;
+
+            case "HIGH":
+                return """
+                        <div style="
+                            display:inline-block;
+                            background-color:#FFE8CC;
+                            color:#8A4B00;
+                            padding:6px 14px;
+                            border-radius:999px;
+                            font-size:13px;
+                            font-weight:bold;
+                            margin-bottom:10px;
+                        ">
+                            أولوية عالية
+                        </div>
+                        """;
+
+            case "MEDIUM":
+                return """
+                        <div style="
+                            display:inline-block;
+                            background-color:#F1DCD2;
+                            color:#4A2F25;
+                            padding:6px 14px;
+                            border-radius:999px;
+                            font-size:13px;
+                            font-weight:bold;
+                            margin-bottom:10px;
+                        ">
+                            أولوية متوسطة
+                        </div>
+                        """;
+
+            case "LOW":
+                return """
+                        <div style="
+                            display:inline-block;
+                            background-color:#E6F4EA;
+                            color:#1E6B3A;
+                            padding:6px 14px;
+                            border-radius:999px;
+                            font-size:13px;
+                            font-weight:bold;
+                            margin-bottom:10px;
+                        ">
+                            أولوية منخفضة
+                        </div>
+                        """;
+
+            default:
+                return """
+                        <div style="
+                            display:inline-block;
+                            background-color:#F1DCD2;
+                            color:#4A2F25;
+                            padding:6px 14px;
+                            border-radius:999px;
+                            font-size:13px;
+                            font-weight:bold;
+                            margin-bottom:10px;
+                        ">
+                            أولوية غير محددة
+                        </div>
+                        """;
+        }
     }
+
+    // Creates a friendly Arabic reminder message from maintenance and weather data.
     private String generateReminderMessageWithAI(Maintenance maintenance, MaintenanceReminderDTOIn dto) {
 
         String weatherDescription = weatherService.getWeatherDescription(maintenance.getHome().getCity());
 
         String prompt = """
-            You are an AI assistant for DAR, a smart Arabic home maintenance platform.
-
-            DAR does not perform maintenance.
-            DAR helps users remember and organize home maintenance tasks.
-
-            Create a short Arabic maintenance reminder message based on the following data:
-
-            Maintenance title: %s
-            Maintenance description: %s
-            Home item: %s
-            Season: %s
-            Weather trigger selected by user: %s
-            Current weather: %s
-
-            Requirements:
-            - Write in Arabic only.
-            - Keep it short and friendly.
-            - Make the message practical and related to home care.
-            - Do not say that DAR will perform the maintenance.
-            - Tell the user what to check or remember.
-            - Return only the reminder message.
-            """.formatted(
+                You are an AI assistant for DAR, a smart Arabic home maintenance platform.
+                
+                DAR does not perform maintenance.
+                DAR helps users remember and organize home maintenance tasks.
+                
+                Create a short Arabic maintenance reminder message based on the following data:
+                
+                Maintenance title: %s
+                Maintenance description: %s
+                Home item: %s
+                Season: %s
+                Weather trigger selected by user: %s
+                Current weather: %s
+                
+                Requirements:
+                - Write in Arabic only.
+                - Keep it short and friendly.
+                - Make the message practical and related to home care.
+                - Do not say that DAR will perform the maintenance.
+                - Tell the user what to check or remember.
+                - Return only the reminder message.
+                """.formatted(
                 maintenance.getTitle(),
                 maintenance.getDescription(),
                 maintenance.getHomeItem().getCategory(),

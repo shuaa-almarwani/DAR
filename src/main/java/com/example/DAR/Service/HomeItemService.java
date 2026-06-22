@@ -169,6 +169,7 @@ public class HomeItemService {
         return homeItems.stream().map(h -> modelMapper.map(h, HomeItemDTOOut.class)).toList();
     }
 
+    // Calculates dashboard counters and average remaining item life.
     public HomeItemSummaryDTOOut getHomeItemSummary(Integer homeId) {
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) {
@@ -201,6 +202,7 @@ public class HomeItemService {
         return new HomeItemSummaryDTOOut(totalItems, needsMaintenance, upcomingServiceCount, averageLifePercentage);
     }
 
+    // Uses the home's coordinates and item category to find nearby service places.
     public List<NearbyPlaceDTOOut> getNearbyMaintenancePlaces(Integer itemId) {
         HomeItem homeItem = homeItemRepository.findHomeItemById(itemId);
         if (homeItem == null) {
@@ -211,6 +213,7 @@ public class HomeItemService {
         return overpassService.getNearbyMaintenancePlaces(home.getLatitude(), home.getLongitude(), homeItem.getCategory());
     }
 
+    // Checks AI access, then returns maintenance advice as a clean list.
     public AiAdviceDTOOut getAiMaintenanceAdvice(Integer itemId) {
         HomeItem homeItem = homeItemRepository.findHomeItemById(itemId);
         if (homeItem == null) {
@@ -231,6 +234,7 @@ public class HomeItemService {
         return new AiAdviceDTOOut(adviceList);
     }
 
+    // Sends the user's issue to AI and returns troubleshooting steps.
     public AiAdviceDTOOut getAiTroubleshootingSteps(Integer itemId, TroubleshootingDTOIn troubleshootingDTOIn) {
         HomeItem homeItem = homeItemRepository.findHomeItemById(itemId);
         if (homeItem == null) {
@@ -251,6 +255,7 @@ public class HomeItemService {
         return new AiAdviceDTOOut(adviceList);
     }
 
+    // Combines nearby places with AI to recommend the best maintenance option.
     public AiAdviceDTOOut getAiNearbyServiceRecommendation(Integer itemId) {
         HomeItem homeItem = homeItemRepository.findHomeItemById(itemId);
         if (homeItem == null) {

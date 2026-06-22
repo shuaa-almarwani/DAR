@@ -18,6 +18,7 @@ public class NominatimService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
+    // Converts a text address into coordinates using Nominatim.
     public LocationDTOOut geocode(String address) {
         String url = UriComponentsBuilder
                 .fromUriString("https://nominatim.openstreetmap.org/search")

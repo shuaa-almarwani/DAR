@@ -47,6 +47,7 @@ public class SensorServiceTest {
         user = new User();
         user.setId(1);
         user.setName("Shahad");
+        user.setRole("USER");
 
         plan = new SubscriptionPlan();
         plan.setMaxSensors(5);

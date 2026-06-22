@@ -58,6 +58,7 @@ public class Sensorreadingservice {
         return sensorReadingRepository.findTopBySensorsIdOrderByReadingDateDesc(sensorId);
     }
 
+    // Builds a home-level sensor report from recent readings.
     public SensorReportDtoOut getSensorReport(Integer homeId) {
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) throw new ApiException("Home not found");

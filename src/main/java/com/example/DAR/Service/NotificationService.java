@@ -33,8 +33,8 @@ public class NotificationService {
     private final HomeItemRepository homeItemRepository;
     private final UserSubscriptionRepository userSubscriptionRepository;
 
-    public List<Notification>  getAllNotifications() {
-        return  notificationRepository.findAll();
+    public List<Notification> getAllNotifications() {
+        return notificationRepository.findAll();
     }
 
     public Notification getNotificationById(Integer notificationId) {
@@ -236,133 +236,133 @@ public class NotificationService {
         String logoUrl = "https://res.cloudinary.com/dhpibz1yq/image/upload/f_auto,q_auto/logo_2_f3xxjb";
 
         return """
-        <div dir="rtl" style="margin:0; padding:0; background-color:#E8DED2; font-family: Arial, Tahoma, sans-serif;">
-            <div style="max-width:620px; margin:auto; padding:24px 14px;">
+                <div dir="rtl" style="margin:0; padding:0; background-color:#E8DED2; font-family: Arial, Tahoma, sans-serif;">
+                    <div style="max-width:620px; margin:auto; padding:24px 14px;">
                 
-                <div style="
-                    background-color:#FFF9F5;
-                    border-radius:20px;
-                    overflow:hidden;
-                    border:1px solid #D8C2B5;
-                    box-shadow:0 8px 24px rgba(59,36,28,0.12);
-                ">
-
-                    <!-- Header -->
-                    <div style="
-                        padding:22px 26px;
-                        background:linear-gradient(135deg, #FFF9F5 0%%, #F3E4DC 100%%);
-                        border-bottom:1px solid #E1CFC4;
-                    ">
-                        <table width="100%%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
-                            <tr>
-                                <td style="text-align:right; vertical-align:middle;">
-                                    <div style="
-                                        display:inline-block;
-                                        background-color:#F1DCD2;
-                                        color:#4A2F25;
-                                        padding:6px 14px;
-                                        border-radius:999px;
-                                        font-size:13px;
-                                        font-weight:bold;
-                                        margin-bottom:10px;
-                                    ">
-                                        إشعار من منصة دار
-                                    </div>
-
-                                
-
-                                    <p style="
-                                        margin:6px 0 0;
-                                        color:#5A3A2E;
-                                        font-size:14px;
-                                        font-weight:bold;
-                                    ">
-                                        منصة ذكية لصيانة منزلك
-                                    </p>
-                                </td>
-
-                                <td style="width:88px; text-align:left; vertical-align:middle;">
-                                    <img src="%s" alt="DAR Logo" style="
-                                        width:72px;
-                                        height:72px;
-                                        object-fit:contain;
-                                        display:block;
-                                        margin-right:auto;
-                                        border-radius:16px;
-                                    ">
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- Body -->
-                    <div style="padding:30px 28px 26px; text-align:right;">
-                        <h2 style="
-                            color:#3B241C;
-                            font-size:23px;
-                            margin:0 0 16px;
-                            font-weight:900;
-                            line-height:1.6;
-                        ">
-                            %s
-                        </h2>
-
-                        <p style="
-                            color:#241713;
-                            font-size:16px;
-                            line-height:2;
-                            margin:0;
-                            font-weight:500;
-                        ">
-                            %s
-                        </p>
-
                         <div style="
-                            margin-top:24px;
-                            background-color:#FFFFFF;
-                            border:1px solid #E0CDC2;
-                            border-radius:16px;
-                            padding:16px 18px;
+                            background-color:#FFF9F5;
+                            border-radius:20px;
+                            overflow:hidden;
+                            border:1px solid #D8C2B5;
+                            box-shadow:0 8px 24px rgba(59,36,28,0.12);
                         ">
-                            <p style="
-                                margin:0;
-                                color:#3B241C;
-                                font-size:14px;
-                                line-height:1.9;
-                                font-weight:bold;
+                
+                            <!-- Header -->
+                            <div style="
+                                padding:22px 26px;
+                                background:linear-gradient(135deg, #FFF9F5 0%%, #F3E4DC 100%%);
+                                border-bottom:1px solid #E1CFC4;
                             ">
-                                يمكنك متابعة الصيانة، الفواتير، التنبيهات، وتفاصيل منزلك من خلال منصة دار.
-                            </p>
+                                <table width="100%%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                                    <tr>
+                                        <td style="text-align:right; vertical-align:middle;">
+                                            <div style="
+                                                display:inline-block;
+                                                background-color:#F1DCD2;
+                                                color:#4A2F25;
+                                                padding:6px 14px;
+                                                border-radius:999px;
+                                                font-size:13px;
+                                                font-weight:bold;
+                                                margin-bottom:10px;
+                                            ">
+                                                إشعار من منصة دار
+                                            </div>
+                
+                
+                
+                                            <p style="
+                                                margin:6px 0 0;
+                                                color:#5A3A2E;
+                                                font-size:14px;
+                                                font-weight:bold;
+                                            ">
+                                                منصة ذكية لصيانة منزلك
+                                            </p>
+                                        </td>
+                
+                                        <td style="width:88px; text-align:left; vertical-align:middle;">
+                                            <img src="%s" alt="DAR Logo" style="
+                                                width:72px;
+                                                height:72px;
+                                                object-fit:contain;
+                                                display:block;
+                                                margin-right:auto;
+                                                border-radius:16px;
+                                            ">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                
+                            <!-- Body -->
+                            <div style="padding:30px 28px 26px; text-align:right;">
+                                <h2 style="
+                                    color:#3B241C;
+                                    font-size:23px;
+                                    margin:0 0 16px;
+                                    font-weight:900;
+                                    line-height:1.6;
+                                ">
+                                    %s
+                                </h2>
+                
+                                <p style="
+                                    color:#241713;
+                                    font-size:16px;
+                                    line-height:2;
+                                    margin:0;
+                                    font-weight:500;
+                                ">
+                                    %s
+                                </p>
+                
+                                <div style="
+                                    margin-top:24px;
+                                    background-color:#FFFFFF;
+                                    border:1px solid #E0CDC2;
+                                    border-radius:16px;
+                                    padding:16px 18px;
+                                ">
+                                    <p style="
+                                        margin:0;
+                                        color:#3B241C;
+                                        font-size:14px;
+                                        line-height:1.9;
+                                        font-weight:bold;
+                                    ">
+                                        يمكنك متابعة الصيانة، الفواتير، التنبيهات، وتفاصيل منزلك من خلال منصة دار.
+                                    </p>
+                                </div>
+                            </div>
+                
+                            <!-- Footer -->
+                            <div style="
+                                background-color:#3B241C;
+                                padding:16px 24px;
+                                text-align:center;
+                            ">
+                                <p style="
+                                    margin:0;
+                                    color:#F4E9DF;
+                                    font-size:13px;
+                                    font-weight:bold;
+                                ">
+                                    © 2026 دار. جميع الحقوق محفوظة.
+                                </p>
+                                <p style="
+                                    margin:7px 0 0;
+                                    color:#D8BFAF;
+                                    font-size:12px;
+                                ">
+                                    هذه رسالة تلقائية من منصة دار
+                                </p>
+                            </div>
+                
                         </div>
                     </div>
-
-                    <!-- Footer -->
-                    <div style="
-                        background-color:#3B241C;
-                        padding:16px 24px;
-                        text-align:center;
-                    ">
-                        <p style="
-                            margin:0;
-                            color:#F4E9DF;
-                            font-size:13px;
-                            font-weight:bold;
-                        ">
-                            © 2026 دار. جميع الحقوق محفوظة.
-                        </p>
-                        <p style="
-                            margin:7px 0 0;
-                            color:#D8BFAF;
-                            font-size:12px;
-                        ">
-                            هذه رسالة تلقائية من منصة دار
-                        </p>
-                    </div>
-
                 </div>
-            </div>
-        </div>
-        """.formatted(logoUrl, title, message);
+                """.formatted(logoUrl, title, message);
     }
 
 
@@ -501,23 +501,23 @@ public class NotificationService {
         }
 
         String prompt = """
-            You are an AI assistant for a smart Arabic home maintenance platform called DAR.
-
-            The platform does not perform maintenance.
-            It only sends smart alerts and reminders to help users take care of their homes.
-
-            Home city: %s
-            Weather description: %s
-            Temperature: %.1f Celsius
-            Humidity: %d
-
-            Alert type: %s
-
-            Write a short Arabic notification message for the homeowner.
-            The message should be practical and related to home care or maintenance.
-            Return only the Arabic notification message.
-            Keep it short, clear, and friendly.
-            """.formatted(
+                You are an AI assistant for a smart Arabic home maintenance platform called DAR.
+                
+                The platform does not perform maintenance.
+                It only sends smart alerts and reminders to help users take care of their homes.
+                
+                Home city: %s
+                Weather description: %s
+                Temperature: %.1f Celsius
+                Humidity: %d
+                
+                Alert type: %s
+                
+                Write a short Arabic notification message for the homeowner.
+                The message should be practical and related to home care or maintenance.
+                Return only the Arabic notification message.
+                Keep it short, clear, and friendly.
+                """.formatted(
                 home.getCity(),
                 description,
                 temperature,
@@ -552,6 +552,7 @@ public class NotificationService {
             System.out.println("Weather alert email not sent: " + e.getMessage());
         }
     }
+
     // helper method
     private String getWeatherAlertType(Double temperature, Integer humidity, String description) {
 
@@ -579,6 +580,7 @@ public class NotificationService {
 
         return null;
     }
+
     public void sendSmartAlertIntro(Integer userId) {
 
         User user = userRepository.findUserById(userId);
@@ -625,9 +627,10 @@ public class NotificationService {
     }
 
 
-//    @Scheduled(cron = "0 0 8 * * *")
-@Scheduled(cron = "0 * * * * *")
-public void sendDailyWeatherTipsAutomatically() {
+    //    @Scheduled(cron = "0 0 8 * * *")
+    @Scheduled(cron = "0 * * * * *")
+    // Scheduler that sends daily AI weather tips to eligible users.
+    public void sendDailyWeatherTipsAutomatically() {
 
         List<Home> homes = homeRepository.findAll();
 
@@ -640,6 +643,7 @@ public void sendDailyWeatherTipsAutomatically() {
             }
         }
     }
+
     public void sendDailyWeatherTip(Integer homeId) {
 
         Home home = homeRepository.findHomeById(homeId);
@@ -679,25 +683,25 @@ public void sendDailyWeatherTipsAutomatically() {
                 .toString();
 
         String prompt = """
-            You are an AI assistant for DAR, a smart Arabic home care platform.
-
-            DAR does not perform maintenance.
-            DAR gives smart reminders and home care advice.
-
-            Based on today's weather and the user's home items, write one short Arabic home care tip.
-
-            City: %s
-            Today's weather: %s
-            User home items: %s
-
-            Requirements:
-            - Arabic only.
-            - Short and practical.
-            - Mention only relevant items from the user's home.
-            - Do not say DAR will perform maintenance.
-            - Give advice the user can do or check.
-            - Return only the message.
-            """.formatted(
+                You are an AI assistant for DAR, a smart Arabic home care platform.
+                
+                DAR does not perform maintenance.
+                DAR gives smart reminders and home care advice.
+                
+                Based on today's weather and the user's home items, write one short Arabic home care tip.
+                
+                City: %s
+                Today's weather: %s
+                User home items: %s
+                
+                Requirements:
+                - Arabic only.
+                - Short and practical.
+                - Mention only relevant items from the user's home.
+                - Do not say DAR will perform maintenance.
+                - Give advice the user can do or check.
+                - Return only the message.
+                """.formatted(
                 home.getCity(),
                 weatherDescription,
                 itemNames
@@ -727,7 +731,9 @@ public void sendDailyWeatherTipsAutomatically() {
                 htmlMessage
         );
     }
+
     // helper
+    // Checks if the user's active paid plan allows daily AI reminders.
     private boolean hasDailyAiReminderAccess(User user) {
         return userSubscriptionRepository
                 .existsUserSubscriptionByUserIdAndStatusAndPaymentStatusAndSubscriptionPlan_DailyAIReminder(
@@ -737,6 +743,8 @@ public void sendDailyWeatherTipsAutomatically() {
                         true
                 );
     }
+
+    // Sends one free smart tip after the first home is added.
     public void sendFreeSmartTipUpsellNotification(Integer homeId) {
 
         Home home = homeRepository.findHomeById(homeId);
@@ -764,20 +772,20 @@ public void sendDailyWeatherTipsAutomatically() {
         String weatherDescription = weatherService.getWeatherDescription(home.getCity());
 
         String prompt = """
-            You are an AI assistant for DAR, a smart Arabic home care platform.
-
-            The user just added a home to DAR.
-            Based on today's weather, write one short Arabic smart home care tip.
-
-            City: %s
-            Today's weather: %s
-
-            Requirements:
-            - Arabic only.
-            - Short and practical.
-            - Do not say DAR will perform maintenance.
-            - Return only the message.
-            """.formatted(
+                You are an AI assistant for DAR, a smart Arabic home care platform.
+                
+                The user just added a home to DAR.
+                Based on today's weather, write one short Arabic smart home care tip.
+                
+                City: %s
+                Today's weather: %s
+                
+                Requirements:
+                - Arabic only.
+                - Short and practical.
+                - Do not say DAR will perform maintenance.
+                - Return only the message.
+                """.formatted(
                 home.getCity(),
                 weatherDescription
         );
