@@ -147,11 +147,24 @@ public class UserSubscriptionService {
 
 
 
-    private UserSubscriptionDtoOut mapToDto(UserSubscription subscription) {
-        UserSubscriptionDtoOut dto = modelMapper.map(subscription, UserSubscriptionDtoOut.class);
-        dto.setUserId(subscription.getUser().getId());
-        dto.setUsername(subscription.getUser().getUsername());
-        dto.setPlanName(subscription.getSubscriptionPlan().getName());
-        return dto;
-    }
+//    private UserSubscriptionDtoOut mapToDto(UserSubscription subscription) {
+//        UserSubscriptionDtoOut dto = modelMapper.map(subscription, UserSubscriptionDtoOut.class);
+//        dto.setUserId(subscription.getUser().getId());
+//        dto.setUsername(subscription.getUser().getUsername());
+//        dto.setPlanName(subscription.getSubscriptionPlan().getName());
+//        return dto;
+//    }
+private UserSubscriptionDtoOut mapToDto(UserSubscription subscription) {
+    UserSubscriptionDtoOut dto = modelMapper.map(subscription, UserSubscriptionDtoOut.class);
+
+    dto.setUserId(subscription.getUser().getId());
+    dto.setUsername(subscription.getUser().getUsername());
+    dto.setPlanName(subscription.getSubscriptionPlan().getName());
+
+    dto.setCheckoutUrl(
+            subscription.getSubscriptionPlan().getLemonSqueezyCheckoutUrl()
+    );
+
+    return dto;
+}
 }

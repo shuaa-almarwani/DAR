@@ -34,6 +34,7 @@ public class UserSubscription {
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
 
+    private String checkoutUrl;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

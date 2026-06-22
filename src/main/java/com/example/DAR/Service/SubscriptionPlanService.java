@@ -52,6 +52,9 @@ public class SubscriptionPlanService {
         plan.setWeatherReminderEnabled(dto.getWeatherReminderEnabled());
         plan.setDailyAIReminder(dto.getDailyAIReminder());
 
+        plan.setLemonSqueezyCheckoutUrl(dto.getLemonSqueezyCheckoutUrl());
+        plan.setLemonSqueezyVariantId(dto.getLemonSqueezyVariantId());
+
         subscriptionPlanRepository.save(plan);
     }
 

@@ -21,4 +21,7 @@ public class SubscriptionPlanDtoOut {
     private Integer maxAiReportsPerMonth;
     private Boolean weatherReminderEnabled;
     private Boolean dailyAIReminder;
+
+    private String lemonSqueezyCheckoutUrl;
+    private String checkoutUrl;
 }

@@ -49,5 +49,6 @@ public class SubscriptionPlanDtoIn {
     @NotNull(message = "daily AI reminder enabled is required")
     private Boolean dailyAIReminder;
 
-
+    private String lemonSqueezyCheckoutUrl;
+    private String lemonSqueezyVariantId;
 }

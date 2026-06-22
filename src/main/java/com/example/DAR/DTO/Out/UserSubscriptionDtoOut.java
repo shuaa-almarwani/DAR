@@ -20,4 +20,5 @@ public class UserSubscriptionDtoOut {
     private LocalDate endDate;
     private UserSubscriptionStatus status;
     private PaymentStatus paymentStatus;
+    private String checkoutUrl;
 }

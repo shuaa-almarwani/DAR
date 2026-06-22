@@ -52,6 +52,12 @@ public class SubscriptionPlan {
     @Column(nullable = false)
     private Boolean dailyAIReminder;
 
+    @Column
+    private String lemonSqueezyCheckoutUrl;
+
+    @Column
+    private String lemonSqueezyVariantId;
+
 
     @OneToMany(mappedBy = "subscriptionPlan")
     @JsonIgnore
