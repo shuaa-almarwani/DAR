@@ -1,5 +1,9 @@
 <div align="center">
 
+<img src="https://res.cloudinary.com/dhpibz1yq/image/upload/v1781622683/logo_2_f3xxjb.png" alt="DAR Logo" width="180"/>
+
+<br>
+
 # 🏠 DAR – Smart Home Care System
 
 ### دار – نظام ذكي للعناية بالمنزل
@@ -18,17 +22,17 @@
 
 <br>
 
-<img src="https://img.shields.io/badge/Java-17-765345?style=for-the-badge&logo=java&logoColor=white" />
-<img src="https://img.shields.io/badge/Spring%20Boot-4.x-A68972?style=for-the-badge&logo=springboot&logoColor=white" />
-<img src="https://img.shields.io/badge/MySQL-Database-765345?style=for-the-badge&logo=mysql&logoColor=white" />
-<img src="https://img.shields.io/badge/AWS-Deployed-A68972?style=for-the-badge&logo=amazonaws&logoColor=white" />
-<img src="https://img.shields.io/badge/OpenAI-AI-765345?style=for-the-badge&logo=openai&logoColor=white" />
-<img src="https://img.shields.io/badge/Twilio-Notifications-A68972?style=for-the-badge&logo=twilio&logoColor=white" />
-<img src="https://img.shields.io/badge/n8n-Automation-765345?style=for-the-badge&logo=n8n&logoColor=white" />
-<img src="https://img.shields.io/badge/Overpass-Location%20API-A68972?style=for-the-badge&logo=openstreetmap&logoColor=white" />
-<img src="https://img.shields.io/badge/Cloudinary-Cloud%20API-765345?style=for-the-badge&logo=cloudinary&logoColor=white" />
-<img src="https://img.shields.io/badge/Nominatim-Geocoding-A68972?style=for-the-badge&logo=openstreetmap&logoColor=white" />
-<img src="https://img.shields.io/badge/WeatherAPI-Weather-765345?style=for-the-badge&logo=weatherapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Java-17-F7DFD4?style=for-the-badge&logo=openjdk&logoColor=E76F00" />
+<img src="https://img.shields.io/badge/Spring%20Boot-4.x-E8F5E9?style=for-the-badge&logo=springboot&logoColor=6DB33F" />
+<img src="https://img.shields.io/badge/MySQL-Database-E3F2FD?style=for-the-badge&logo=mysql&logoColor=4479A1" />
+<img src="https://img.shields.io/badge/AWS-Deployed-FFF3E0?style=for-the-badge&logo=amazonaws&logoColor=FF9900" />
+<img src="https://img.shields.io/badge/OpenAI-AI-E8F5E9?style=for-the-badge&logo=openai&logoColor=412991" />
+<img src="https://img.shields.io/badge/Twilio-Notifications-FFEBEE?style=for-the-badge&logo=twilio&logoColor=F22F46" />
+<img src="https://img.shields.io/badge/n8n-Automation-FFECEF?style=for-the-badge&logo=n8n&logoColor=EA4B71" />
+<img src="https://img.shields.io/badge/Overpass-Location%20API-E8F5E9?style=for-the-badge&logo=openstreetmap&logoColor=7EBC6F" />
+<img src="https://img.shields.io/badge/Cloudinary-Cloud%20API-E3F2FD?style=for-the-badge&logo=cloudinary&logoColor=3448C5" />
+<img src="https://img.shields.io/badge/Nominatim-Geocoding-E8F5E9?style=for-the-badge&logo=openstreetmap&logoColor=7EBC6F" />
+<img src="https://img.shields.io/badge/WeatherAPI-Weather-E3F2FD?style=for-the-badge&logo=weatherapi&logoColor=2196F3" />
 
 </div>
 
@@ -50,24 +54,37 @@
 
 ---
 
-## 🎯 Project Goal
 
-DAR aims to solve common home-care problems such as forgotten maintenance tasks, missing invoices and warranties, difficulty tracking bills, and lack of proactive smart reminders.
+## ✨ Key Features
 
-The system helps users:
-
-* Organize home devices and items.
-* Track maintenance history.
-* Receive reminders through email, WhatsApp, and urgent calls.
-* Monitor bills and invoices.
-* Use AI-powered recommendations.
-* Get smart alerts based on weather and sensor behavior.
+<table>
+  <tr>
+    <td>🏠 Home and room management</td>
+    <td>🧰 Home item tracking</td>
+  </tr>
+  <tr bgcolor="#E8DED2">
+    <td>🛠️ Maintenance scheduling</td>
+    <td>⏰ Smart reminders</td>
+  </tr>
+  <tr>
+    <td>📄 Bills and invoice management</td>
+    <td>📈 Bill anomaly detection</td>
+  </tr>
+  <tr bgcolor="#E8DED2">
+    <td>🤖 AI chatbot support</td>
+    <td>🌦️ Weather-based maintenance advice</td>
+  </tr>
+  <tr>
+    <td>🔔 Email, WhatsApp, and call notifications</td>
+    <td>💳 Subscription and payment management</td>
+  </tr>
+</table>
 
 ---
 
 ## 🧭 Use Case Diagram
 
-![DAR ER Diagram](./docs/use_case.png)
+![DAR Use Case Diagram](./docs/use_case.png)
 
 ---
 
@@ -108,7 +125,7 @@ Authorization: Bearer <token>
     <td>✅ JWT-Based Authentication</td>
     <td>✅ Stateless Session Management</td>
   </tr>
-  <tr>
+  <tr bgcolor="#E8DED2">
     <td>✅ Role-Based Access Control</td>
     <td>✅ Ownership Validation</td>
   </tr>
@@ -140,30 +157,15 @@ http://Dar-env.eba-yke92rm3.eu-central-1.elasticbeanstalk.com
 
 ## 📬 Postman Collection
 
-### Base URL
-
-```http
-https://documenter.getpostman.com/view/37607702/2sBXwwnSzc
-```
-
-
 The project APIs are documented and tested using Postman.
+
+[View Postman Collection](https://documenter.getpostman.com/view/37607702/2sBXwwnSzc)
 
 The collection includes:
 
-* Authentication
-* User management
-* Homes
-* Home items
-* Maintenance
-* Maintenance reminders
-* Notifications
-* Bills
-* Purchase invoices
-* Sensors
-* Subscriptions
-* Payments
-* Chatbot
+Authentication • User management • Homes • Home items • Maintenance • Maintenance reminders • Notifications • Bills • Purchase invoices • Sensors • Subscriptions • Payments • Chatbot
+
+
 
 ---
 
@@ -174,41 +176,145 @@ The collection includes:
     <th><font color="white">Category</font></th>
     <th><font color="white">Technologies</font></th>
   </tr>
+
   <tr>
     <td><b>Backend</b></td>
-    <td>Java 17, Spring Boot</td>
+    <td>
+      <img src="https://img.shields.io/badge/Java-17-F7DFD4?style=for-the-badge&logo=openjdk&logoColor=E76F00" />
+      <img src="https://img.shields.io/badge/Spring%20Boot-4.x-E8F5E9?style=for-the-badge&logo=springboot&logoColor=6DB33F" />
+      <img src="https://img.shields.io/badge/Spring%20MVC-Web-E8F5E9?style=for-the-badge&logo=spring&logoColor=6DB33F" />
+    </td>
   </tr>
+
   <tr bgcolor="#E8DED2">
     <td><b>Security</b></td>
-    <td>Spring Security, JWT Authentication</td>
+    <td>
+      <img src="https://img.shields.io/badge/Spring%20Security-Security-E8F5E9?style=for-the-badge&logo=springsecurity&logoColor=6DB33F" />
+      <img src="https://img.shields.io/badge/JWT-Authentication-F4E7FF?style=for-the-badge&logo=jsonwebtokens&logoColor=000000" />
+    </td>
   </tr>
+
   <tr>
     <td><b>Database</b></td>
-    <td>MySQL, Spring Data JPA</td>
+    <td>
+      <img src="https://img.shields.io/badge/MySQL-Database-E3F2FD?style=for-the-badge&logo=mysql&logoColor=4479A1" />
+      <img src="https://img.shields.io/badge/Spring%20Data%20JPA-ORM-E8F5E9?style=for-the-badge&logo=spring&logoColor=6DB33F" />
+      <img src="https://img.shields.io/badge/Hibernate-JPA-FFF8E1?style=for-the-badge&logo=hibernate&logoColor=59666C" />
+    </td>
   </tr>
+
   <tr bgcolor="#E8DED2">
     <td><b>Deployment</b></td>
-    <td>AWS Elastic Beanstalk, AWS RDS</td>
+    <td>
+      <img src="https://img.shields.io/badge/AWS%20Elastic%20Beanstalk-Deployment-FFF3E0?style=for-the-badge&logo=amazonaws&logoColor=FF9900" />
+      <img src="https://img.shields.io/badge/AWS%20RDS-MySQL-FFF3E0?style=for-the-badge&logo=amazonrds&logoColor=527FFF" />
+    </td>
   </tr>
+
   <tr>
     <td><b>AI & Automation</b></td>
-    <td>OpenAI API, Weather API, n8n Webhooks</td>
+    <td>
+      <img src="https://img.shields.io/badge/OpenAI-API-E8F5E9?style=for-the-badge&logo=openai&logoColor=412991" />
+      <img src="https://img.shields.io/badge/WeatherAPI-Weather-E3F2FD?style=for-the-badge&logo=weatherapi&logoColor=2196F3" />
+      <img src="https://img.shields.io/badge/n8n-Webhooks-FFECEF?style=for-the-badge&logo=n8n&logoColor=EA4B71" />
+    </td>
   </tr>
+
   <tr bgcolor="#E8DED2">
     <td><b>Notifications</b></td>
-    <td>Twilio API, Java Mail Sender</td>
+    <td>
+      <img src="https://img.shields.io/badge/Twilio-API-FFEBEE?style=for-the-badge&logo=twilio&logoColor=F22F46" />
+      <img src="https://img.shields.io/badge/JavaMail-Sender-FFF3E0?style=for-the-badge&logo=gmail&logoColor=EA4335" />
+    </td>
   </tr>
+
+  <tr>
+    <td><b>Location & Maps</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/Overpass-Location%20API-E8F5E9?style=for-the-badge&logo=openstreetmap&logoColor=7EBC6F" />
+      <img src="https://img.shields.io/badge/Nominatim-Geocoding-E8F5E9?style=for-the-badge&logo=openstreetmap&logoColor=7EBC6F" />
+    </td>
+  </tr>
+
+  <tr bgcolor="#E8DED2">
+    <td><b>Cloud Storage</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/Cloudinary-Cloud%20Storage-E3F2FD?style=for-the-badge&logo=cloudinary&logoColor=3448C5" />
+    </td>
+  </tr>
+
   <tr>
     <td><b>Testing & Documentation</b></td>
-    <td>Postman</td>
+    <td>
+      <img src="https://img.shields.io/badge/Postman-API%20Testing-FFF3E0?style=for-the-badge&logo=postman&logoColor=FF6C37" />
+      <img src="https://img.shields.io/badge/README-Documentation-F5F5F5?style=for-the-badge&logo=markdown&logoColor=000000" />
+    </td>
   </tr>
+
+  <tr bgcolor="#E8DED2">
+    <td><b>Build Tools</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/Maven-Build%20Tool-FFF0F0?style=for-the-badge&logo=apachemaven&logoColor=C71A36" />
+      <img src="https://img.shields.io/badge/Lombok-Boilerplate%20Reduction-F7DFD4?style=for-the-badge&logo=openjdk&logoColor=E76F00" />
+    </td>
+  </tr>
+
 </table>
 
 ---
 
-## 👩‍💻  Implemented Endpoints
+## 📁 Project Structure
 
-This section highlights the API endpoints 
+```text
+DAR/
+├── src/
+│   ├── main/
+│   │   ├── java/com/example/DAR/
+│   │   │   ├── Controller/
+│   │   │   ├── Service/
+│   │   │   ├── Repository/
+│   │   │   ├── Model/
+│   │   │   ├── DTO/
+│   │   │   ├── Security/
+│   │   │   └── Config/
+│   │   └── resources/
+│   │       └── application.properties
+├── docs/
+│   ├── er-diagram.png
+│   └── use_case.png
+├── pom.xml
+└── README.md
+```
+
+
+---
+
+## ▶️ Run Locally
+
+Follow these steps to run the project locally:
+
+```bash
+git clone <repository-url>
+cd DAR
+mvn clean install
+mvn spring-boot:run
+```
+
+Make sure MySQL is running and the database configuration is set correctly before starting the application.
+
+Example local database URL:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/dar_system
+spring.datasource.username=root
+spring.datasource.password=your_password
+```
+
+---
+
+## 👩‍💻 Implemented Endpoints
+
+This section highlights the main implemented API endpoints in the DAR backend.
 
 ### 🤖 Chatbot Endpoints
 
@@ -217,6 +323,8 @@ This section highlights the API endpoints
 | `GET`  | `/api/v1/chatbot/questions` | Returns suggested chatbot questions for users.               | Public                 |
 | `POST` | `/api/v1/chatbot/ask`       | Sends a user question to the chatbot and returns the answer. | Public / Authenticated |
 
+---
+
 ### 🛠️ Maintenance Endpoints
 
 | Method | Endpoint                                        | Description                                               | Access        |
@@ -224,6 +332,8 @@ This section highlights the API endpoints
 | `GET`  | `/api/v1/maintenance/upcoming/{homeId}`         | Returns upcoming maintenance records for a specific home. | Owner / Admin |
 | `GET`  | `/api/v1/maintenance/overdue/{homeId}`          | Returns overdue maintenance records for a specific home.  | Owner / Admin |
 | `PUT`  | `/api/v1/maintenance/mark-done/{maintenanceId}` | Marks a maintenance record as completed.                  | Owner / Admin |
+
+---
 
 ### ⏰ Maintenance Reminder Endpoints
 
@@ -239,6 +349,8 @@ This section highlights the API endpoints
 | `GET`  | `/api/v1/maintenance-reminder/summary/{homeId}`                  | Returns a summary of reminders for a home.              | Owner / Admin |
 | `GET`  | `/api/v1/maintenance-reminder/ai-weather-advice/{homeId}`        | Generates AI weather-based maintenance advice.          | Owner / Admin |
 
+---
+
 ### 🔔 Notification Endpoints
 
 | Method   | Endpoint                                             | Description                                        | Access        |
@@ -250,6 +362,8 @@ This section highlights the API endpoints
 | `POST`   | `/api/v1/notification/weather-alert/{homeId}`        | Creates a weather alert notification for a home.   | Admin         |
 | `POST`   | `/api/v1/notification/smart-alert-intro/{userId}`    | Sends the smart alert introduction notification.   | Admin         |
 
+---
+
 ### 💳 User Subscription Endpoints
 
 | Method   | Endpoint                                    | Description                                    | Access |
@@ -257,60 +371,73 @@ This section highlights the API endpoints
 | `GET`    | `/api/v1/user-subscription/status/{status}` | Returns user subscriptions filtered by status. | Admin  |
 | `DELETE` | `/api/v1/user-subscription/delete/{id}`     | Deletes a user subscription.                   | Admin  |
 
+---
+
 ### 📈 Bill Endpoints
 
-| Method | Endpoint | Description | Access |
-|---|---|---|---|
-| `GET` | `/api/v1/bill/get/anomalies/{homeId}` | Get bills with abnormal consumption or unusual usage spikes. | Admin or home owner |
-| `GET` | `/api/v1/bill/anomalies-count/{homeId}` | Count the number of detected consumption anomalies for a home. | Admin or home owner |
+| Method | Endpoint                                | Description                                                    | Access              |
+| ------ | --------------------------------------- | -------------------------------------------------------------- | ------------------- |
+| `GET`  | `/api/v1/bill/get/anomalies/{homeId}`   | Get bills with abnormal consumption or unusual usage spikes.   | Admin or home owner |
+| `GET`  | `/api/v1/bill/anomalies-count/{homeId}` | Count the number of detected consumption anomalies for a home. | Admin or home owner |
+
 ---
 
 ## 🔌 External APIs & Integrations
 
-DAR uses external services to support smart features, automation, notifications, and payments.
+DAR uses external services to support smart features, automation, notifications, cloud storage, location services, and payments.
 
 <table>
   <tr bgcolor="#765345">
     <th><font color="white">Service</font></th>
     <th><font color="white">Purpose</font></th>
   </tr>
+
   <tr>
-    <td><b>OpenAI API</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/OpenAI-API-E8F5E9?style=for-the-badge&logo=openai&logoColor=412991" />
+    </td>
     <td>Chatbot answers and AI maintenance advice</td>
   </tr>
+
   <tr bgcolor="#E8DED2">
-    <td><b>Weather API</b></td>
-    <td>Weather-based maintenance alerts</td>
+    <td>
+      <img src="https://img.shields.io/badge/WeatherAPI-Weather-E3F2FD?style=for-the-badge&logo=weatherapi&logoColor=2196F3" />
+    </td>
+    <td>Weather-based maintenance alerts and advice</td>
   </tr>
-  <tr bgcolor="#E8DED2">
-    <td><b>Twilio WhatsApp & Voice</b></td>
+
+  <tr>
+    <td>
+      <img src="https://img.shields.io/badge/Twilio-WhatsApp%20%26%20Voice-FFEBEE?style=for-the-badge&logo=twilio&logoColor=F22F46" />
+    </td>
     <td>WhatsApp reminders and urgent calls</td>
   </tr>
-  <tr>
-    <td><b>Gmail SMTP</b></td>
+
+  <tr bgcolor="#E8DED2">
+    <td>
+      <img src="https://img.shields.io/badge/Gmail-SMTP-FFF3E0?style=for-the-badge&logo=gmail&logoColor=EA4335" />
+    </td>
     <td>Email reminders and notifications</td>
   </tr>
-  <tr bgcolor="#E8DED2">
-    <td><b>Lemon Squeezy</b></td>
+
+  <tr>
+    <td>
+      <img src="https://img.shields.io/badge/Lemon%20Squeezy-Payments-FFF0F5?style=for-the-badge&logo=lemonsqueezy&logoColor=7047EB" />
+    </td>
     <td>Subscription checkout and payment links</td>
   </tr>
   <tr>
-    <td><b>AWS Elastic Beanstalk</b></td>
+    <td>
+      <img src="https://img.shields.io/badge/AWS%20Elastic%20Beanstalk-Backend-FFF3E0?style=for-the-badge&logo=amazonaws&logoColor=FF9900" />
+    </td>
     <td>Backend deployment</td>
   </tr>
+
   <tr bgcolor="#E8DED2">
-    <td><b>AWS RDS MySQL</b></td>
-    <td>Production database</td>
-  </tr>
-</table>
-
-<br>
-
-<table>
-  <tr>
-    <td bgcolor="#F7F2EC">
-      API keys and secrets are stored in environment variables, not inside the source code.
+    <td>
+      <img src="https://img.shields.io/badge/AWS%20RDS-MySQL-FFF3E0?style=for-the-badge&logo=amazonrds&logoColor=527FFF" />
     </td>
+    <td>Production database</td>
   </tr>
 </table>
 
@@ -321,7 +448,7 @@ DAR uses external services to support smart features, automation, notifications,
 <table>
   <tr>
     <td bgcolor="#E8DED2">
-      DAR includes AI features to make home maintenance smarter and more proactive.
+      DAR includes AI features to make home maintenance smarter, more proactive, and easier for users.
     </td>
   </tr>
 </table>
@@ -338,11 +465,11 @@ DAR uses external services to support smart features, automation, notifications,
   <tr>
     <td>🔔 Daily smart AI reminders for users with an active paid subscription.</td>
   </tr>
+ 
 </table>
 
-
-
 ---
+
 
 <div align="center">
 
@@ -351,6 +478,8 @@ DAR uses external services to support smart features, automation, notifications,
     <td align="center" bgcolor="#E8DED2">
       <br>
       <b>DAR makes home care easier, smarter, and more organized.</b>
+      <br><br>
+      <b>دار يجعل العناية بالمنزل أسهل، أذكى، وأكثر تنظيمًا.</b>
       <br><br>
     </td>
   </tr>
