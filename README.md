@@ -140,6 +140,13 @@ http://Dar-env.eba-yke92rm3.eu-central-1.elasticbeanstalk.com
 
 ## 📬 Postman Collection
 
+### Base URL
+
+```http
+https://documenter.getpostman.com/view/37607702/2sBXwwnSzc
+```
+
+
 The project APIs are documented and tested using Postman.
 
 The collection includes:
