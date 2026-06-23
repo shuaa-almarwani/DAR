@@ -16,7 +16,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -35,57 +34,10 @@ public class LemonSqueezyService {
 
     public String createCheckout(Integer userSubscriptionId) {
         UserSubscription userSubscription = userSubscriptionRepository.findUserSubscriptionById(userSubscriptionId);
-        if (userSubscription == null) {
-            throw new ApiException("User subscription not found");
-        }
-
-        String variantId = userSubscription.getSubscriptionPlan().getLemonSqueezyVariantId();
-        String userId = userSubscription.getUser().getId().toString();
-
-        String payload = String.format("""
-                {
-                  "data": {
-                    "type": "checkouts",
-                    "attributes": {
-                      "checkout_data": {
-                        "custom": {
-                          "user_id": "%s",
-                          "variant_id": "%s"
-                        }
-                      }
-                    },
-                    "relationships": {
-                      "store": {
-                        "data": {
-                          "type": "stores",
-                          "id": "%s"
-                        }
-                      },
-                      "variant": {
-                        "data": {
-                          "type": "variants",
-                          "id": "%s"
-                        }
-                      }
-                    }
-                  }
-                }
-                """, userId, variantId, storeId, variantId);
-
-        Map response = webClient.post()
-                .uri("/checkouts")
-                .bodyValue(payload)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-
-        if (response == null) {
-            throw new ApiException("Failed to create checkout");
-        }
-
-        Map data = (Map) response.get("data");
-        Map attributes = (Map) data.get("attributes");
-        return (String) attributes.get("url");
+        if (userSubscription == null) throw new ApiException("User subscription not found");
+        String checkoutUrl = userSubscription.getSubscriptionPlan().getLemonSqueezyCheckoutUrl();
+        if (checkoutUrl == null) throw new ApiException("No checkout URL configured for this plan");
+        return checkoutUrl + "?checkout[custom][userSubscriptionId]=" + userSubscriptionId;
     }
 
     public void processWebhook(HttpHeaders headers, String rawBody) {

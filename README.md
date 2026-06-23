@@ -199,11 +199,9 @@ The collection includes:
 
 ---
 
-## 👩‍💻 My Implemented Endpoints
+## 👩‍💻  Implemented Endpoints
 
-This section highlights the API endpoints I worked on as part of my contribution to the DAR platform.
-
-My work focused mainly on **chatbot support, maintenance tracking, maintenance reminders, notifications, smart alerts, and subscription-related features**.
+This section highlights the API endpoints 
 
 ### 🤖 Chatbot Endpoints
 
@@ -245,14 +243,6 @@ My work focused mainly on **chatbot support, maintenance tracking, maintenance r
 | `POST`   | `/api/v1/notification/weather-alert/{homeId}`        | Creates a weather alert notification for a home.   | Admin         |
 | `POST`   | `/api/v1/notification/smart-alert-intro/{userId}`    | Sends the smart alert introduction notification.   | Admin         |
 
-### 👤 User Utility Endpoints
-
-| Method | Endpoint                           | Description                                            | Access        |
-| ------ | ---------------------------------- | ------------------------------------------------------ | ------------- |
-| `GET`  | `/api/v1/user/email/{email}`       | Finds a user by email.                                 | Admin         |
-| `GET`  | `/api/v1/user/username/{username}` | Finds a user by username.                              | Admin         |
-| `PUT`  | `/api/v1/user/toggle-smart-alerts` | Enables or disables smart alerts for the current user. | Authenticated |
-
 ### 💳 User Subscription Endpoints
 
 | Method   | Endpoint                                    | Description                                    | Access |
@@ -260,6 +250,12 @@ My work focused mainly on **chatbot support, maintenance tracking, maintenance r
 | `GET`    | `/api/v1/user-subscription/status/{status}` | Returns user subscriptions filtered by status. | Admin  |
 | `DELETE` | `/api/v1/user-subscription/delete/{id}`     | Deletes a user subscription.                   | Admin  |
 
+### 📈 Bill Endpoints
+
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/api/v1/bill/get/anomalies/{homeId}` | Get bills with abnormal consumption or unusual usage spikes. | Admin or home owner |
+| `GET` | `/api/v1/bill/anomalies-count/{homeId}` | Count the number of detected consumption anomalies for a home. | Admin or home owner |
 ---
 
 ## 🔌 External APIs & Integrations
@@ -278,10 +274,6 @@ DAR uses external services to support smart features, automation, notifications,
   <tr bgcolor="#E8DED2">
     <td><b>Weather API</b></td>
     <td>Weather-based maintenance alerts</td>
-  </tr>
-  <tr>
-    <td><b>n8n Webhooks</b></td>
-    <td>Sensor connection and sensor analysis automation</td>
   </tr>
   <tr bgcolor="#E8DED2">
     <td><b>Twilio WhatsApp & Voice</b></td>
@@ -338,9 +330,6 @@ DAR uses external services to support smart features, automation, notifications,
   </tr>
   <tr>
     <td>🔔 Daily smart AI reminders for users with an active paid subscription.</td>
-  </tr>
-  <tr bgcolor="#E8DED2">
-    <td>📊 AI-assisted sensor analysis through n8n webhooks.</td>
   </tr>
 </table>
 

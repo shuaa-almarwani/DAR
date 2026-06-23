@@ -253,11 +253,10 @@ public class MaintenanceReminderService {
         }
 
         reminder.setIsSent(true);
-//        if (reminder.getMaintenance().getPriority().equalsIgnoreCase("URGENT")
-//                && !method.equals("CALL")) {
-//            callUserForReminder(user, reminder);
-//        }
-        // شيلي التعليق قبل العرض
+       if (reminder.getMaintenance().getPriority().equalsIgnoreCase("URGENT")
+               && !method.equals("CALL")) {
+           callUserForReminder(user, reminder);
+       }
         maintenanceReminderRepository.save(reminder);
     }
 
