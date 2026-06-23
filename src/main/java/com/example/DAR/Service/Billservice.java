@@ -45,6 +45,7 @@ public class Billservice {
         checkAndFlagAnomaly(bill, home);
     }
 
+    // Flags unusually high consumption by comparing it with the latest bills of the same type.
     private void checkAndFlagAnomaly(Bill bill, Home home) {
         List<Bill> previous = billRepository.findTop3ByHomeIdAndTypeOrderByBillMonthDesc(home.getId(), bill.getType());
         previous = previous.stream().filter(b -> !b.getId().equals(bill.getId())).toList();
@@ -95,10 +96,10 @@ public class Billservice {
     // UPDATE
     public void updateBill(Integer id, BillDtoIn dto) {
         Bill existing = billRepository.findBillById(id);
-        if (existing==null) {
-            throw new ApiException("bill not found");
-        }
+        if (existing == null) throw new ApiException("bill not found");
         modelMapper.map(dto, existing);
+        existing.setIsAnomaly(false);
+        checkAndFlagAnomaly(existing, existing.getHome());
         billRepository.save(existing);
     }
 
@@ -126,6 +127,7 @@ public class Billservice {
     }
 
     // UPLOAD IMAGE → AI extract → save Bill
+    // Uses AI image extraction, then saves the bill as a normal bill record.
     public BillDtoOut addBillFromImage(Integer homeId, MultipartFile file) {
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) throw new ApiException("home not found");
@@ -135,10 +137,17 @@ public class Billservice {
             Map<String, Object> data = new ObjectMapper().readValue(json, Map.class);
             Bill bill = new Bill();
             bill.setHome(home);
-            bill.setType(((String) data.get("type")).toUpperCase());
-            bill.setBillMonth(LocalDate.parse((String) data.get("billMonth")));
-            bill.setConsumption(((Number) data.get("consumption")).intValue());
-            bill.setAmount(((Number) data.get("amount")).doubleValue());
+            String type = (String) data.get("type");
+            String billMonth = (String) data.get("billMonth");
+            Number consumption = (Number) data.get("consumption");
+            Number amount = (Number) data.get("amount");
+            if (type == null || billMonth == null || consumption == null || amount == null) {
+                throw new ApiException("AI could not extract required bill fields");
+            }
+            bill.setType(type.toUpperCase());
+            bill.setBillMonth(LocalDate.parse(billMonth));
+            bill.setConsumption(consumption.intValue());
+            bill.setAmount(amount.doubleValue());
             bill.setUnit((String) data.get("unit"));
             bill.setIsInstallment((Boolean) data.getOrDefault("isInstallment", false));
             bill.setTotalInstallment(((Number) data.getOrDefault("totalInstallment", 0)).intValue());
@@ -155,6 +164,7 @@ public class Billservice {
     }
 
     // COMPARE BILLS
+    // Builds a monthly comparison and asks AI for a short explanation.
     public BillComparisonResponseDtoOut compareBills(Integer homeId, String type, int months) {
         if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
         LocalDate from = LocalDate.now().minusMonths(months).withDayOfMonth(1);
@@ -227,6 +237,7 @@ public class Billservice {
         Double amount = billRepository.sumAmountByHomeIdAndTypeAndMonth(homeId, "GAS", year, month);
         return Map.of("type", "GAS", "amount", amount != null ? amount : 0.0, "period", year + "-" + String.format("%02d", month));}
 
+    // Returns the number of anomaly bills for dashboard alerts.
     public Map<String, ? > anomaliesCount(Integer homeId) {
         if (homeRepository.findHomeById(homeId) == null) throw new ApiException("home not found");
         Long count = billRepository.countAnomaliesByHomeId(homeId);

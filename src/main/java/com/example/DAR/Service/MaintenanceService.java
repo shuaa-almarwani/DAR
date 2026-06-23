@@ -178,6 +178,7 @@ public class MaintenanceService {
         maintenanceRepository.save(maintenance);
     }
 
+    // Counts maintenance records by status for the home dashboard.
     public MaintenanceSummaryDTOOut getMaintenanceSummary(Integer homeId) {
 
         Home home = homeRepository.findHomeById(homeId);
@@ -224,6 +225,7 @@ public class MaintenanceService {
         );
     }
 
+    // Treats several common status words as completed.
     private boolean isMaintenanceDone(Maintenance maintenance) {
         return maintenance.getStatus().equalsIgnoreCase("DONE")
                 || maintenance.getStatus().equalsIgnoreCase("COMPLETED");

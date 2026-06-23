@@ -10,7 +10,7 @@ public class UserSubscriptionScheduler {
 
     private final UserSubscriptionService userSubscriptionService;
 
-    @Scheduled(cron = "0 50 13 * * *")
+    @Scheduled(cron = "0 0 8 * * *")
     public void expireOutdatedSubscriptions() {
         userSubscriptionService.expireOutdatedSubscriptions();
     }

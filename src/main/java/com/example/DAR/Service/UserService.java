@@ -9,7 +9,6 @@ import com.example.DAR.Security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -57,15 +56,23 @@ public class UserService {
             throw new ApiException("Email already exists");
         }
 
+        if (!dto.getPassword().equals(dto.getPasswordConfirmation())) {
+            throw new ApiException("Passwords don't match");
+        }
+
+        if (!dto.getAcceptTermsAndConditions()){
+            throw new ApiException("acceptTermsAndConditions must be true");
+        }
+
         User user = modelMapper.map(dto, User.class);
         user.setAiCounter(0);
         user.setCreateAt(LocalDate.now());
+        user.setRole("USER");
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         userRepository.save(user);
         notificationService.sendWelcomeNotification(user.getId());
     }
-
 
     public void updateUser(Integer id, UserDtoIn dto) {
 
@@ -88,12 +95,13 @@ public class UserService {
         oldUser.setName(dto.getName());
         oldUser.setEmail(dto.getEmail());
         oldUser.setUsername(dto.getUsername());
-        oldUser.setPassword(dto.getPassword());
+        oldUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         oldUser.setPhoneNumber(dto.getPhoneNumber());
 
         userRepository.save(oldUser);
         notificationService.sendProfileUpdatedNotification(oldUser.getId());
     }
+
     public void deleteUser(Integer id) {
 
         User user = userRepository.findUserById(id);
@@ -105,6 +113,7 @@ public class UserService {
         notificationService.sendAccountDeletedNotification(user);
         userRepository.delete(user);
     }
+
 
     public UserDtoOut getUserById(Integer id) {
         User user = userRepository.findUserById(id);

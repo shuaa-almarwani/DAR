@@ -6,6 +6,7 @@ import com.example.DAR.Service.SubscriptionPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/v1/subscription-plan")
@@ -22,12 +23,14 @@ public class SubscriptionPlanController {
 
 
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> addPlan(@RequestBody @Valid SubscriptionPlanDtoIn dto) {
         subscriptionPlanService.addPlan(dto);
         return ResponseEntity.status(200).body(new ApiResponse("Subscription plan added successfully"));
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updatePlan(@PathVariable Integer id,
                                      @RequestBody @Valid SubscriptionPlanDtoIn dto) {
         subscriptionPlanService.updatePlan(id, dto);
@@ -35,6 +38,7 @@ public class SubscriptionPlanController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deletePlan(@PathVariable Integer id) {
         subscriptionPlanService.deletePlan(id);
         return ResponseEntity.status(200).body(new ApiResponse("Subscription plan deleted successfully"));

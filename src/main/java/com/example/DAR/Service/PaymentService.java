@@ -41,6 +41,7 @@ public class PaymentService {
     }
 
 
+    // Confirms an unpaid subscription payment and activates the subscription.
     public void addPayment(Integer userSubscriptionId, PaymentDtoIn dto) {
 
         UserSubscription userSubscription =
@@ -109,5 +110,37 @@ public class PaymentService {
         }
 
         return dtoOuts;
+    }
+
+    public void activateSubscriptionFromWebhook(Integer subscriptionId, String transactionReference) {
+        UserSubscription userSubscription = userSubscriptionRepository.findUserSubscriptionById(subscriptionId);
+
+        if (userSubscription == null) throw new ApiException("User subscription not found");
+        if (userSubscription.getPaymentStatus() == PaymentStatus.PAID) return;
+
+        Payment payment = new Payment();
+        payment.setUserSubscription(userSubscription);
+        payment.setAmount(userSubscription.getSubscriptionPlan().getPrice());
+        payment.setPaymentMethod("LemonSqueezy");
+        payment.setTransactionReference(transactionReference);
+        payment.setPaymentDate(LocalDate.now());
+        payment.setStatus(PaymentStatus.PAID);
+        paymentRepository.save(payment);
+
+        List<UserSubscription> activeSubscriptions = userSubscriptionRepository.findOtherByUserAndStatus(
+                userSubscription.getUser().getId(), UserSubscriptionStatus.ACTIVE, userSubscription.getId());
+        for (UserSubscription active : activeSubscriptions) {
+            active.setStatus(UserSubscriptionStatus.CANCELLED);
+            userSubscriptionRepository.save(active);
+        }
+
+        userSubscription.setStatus(UserSubscriptionStatus.ACTIVE);
+        userSubscription.setPaymentStatus(PaymentStatus.PAID);
+        userSubscription.setStartDate(LocalDate.now());
+        userSubscription.setEndDate(LocalDate.now().plusDays(29));
+        userSubscriptionRepository.save(userSubscription);
+
+        notificationService.sendSubscriptionActivatedNotification(
+                userSubscription.getUser(), userSubscription.getSubscriptionPlan().getName());
     }
 }

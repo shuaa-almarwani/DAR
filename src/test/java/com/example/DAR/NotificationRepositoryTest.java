@@ -47,6 +47,7 @@ public class NotificationRepositoryTest {
         user.setUsername("shuaa");
         user.setPassword("123456");
         user.setPhoneNumber("0555555555");
+        user.setRole("USER");
         user.setCreateAt(LocalDate.now());
         user.setSmartAlertsEnabled(true);
         user.setSmartAlertIntroSent(false);

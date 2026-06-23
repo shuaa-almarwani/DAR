@@ -55,9 +55,12 @@ public class Sensorreadingservice {
 
     // GET Latest Reading
     public SensorReading getLatestReading(Integer sensorId) {
-        return sensorReadingRepository.findTopBySensorsIdOrderByReadingDateDesc(sensorId);
+        SensorReading reading = sensorReadingRepository.findTopBySensorsIdOrderByReadingDateDesc(sensorId);
+        if (reading == null) throw new ApiException("No readings found for this sensor");
+        return reading;
     }
 
+    // Builds a home-level sensor report from recent readings.
     public SensorReportDtoOut getSensorReport(Integer homeId) {
         Home home = homeRepository.findHomeById(homeId);
         if (home == null) throw new ApiException("Home not found");

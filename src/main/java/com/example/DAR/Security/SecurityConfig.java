@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -48,10 +49,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/user/register",
                                 "/api/v1/user/login",
-                                "/api/v1/user/add",
                                 "/api/v1/subscription-plan/get",
-                                "/api/v1/chatbot/**"
-
+                                "/api/v1/chatbot/**",
+                                "/api/v1/payment/webhook"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

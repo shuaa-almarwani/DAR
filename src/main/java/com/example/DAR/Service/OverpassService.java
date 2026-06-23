@@ -25,6 +25,7 @@ public class OverpassService {
     private final RestTemplate restTemplate = new RestTemplate();
     private static final String OVERPASS_URL = "https://overpass-api.de/api/interpreter";
 
+    // Calls Overpass to find nearby places that match the item category.
     public List<NearbyPlaceDTOOut> getNearbyMaintenancePlaces(Double latitude, Double longitude, HomeItemCategory category) {
         String query = buildQuery(latitude, longitude, category);
 
@@ -42,6 +43,7 @@ public class OverpassService {
         }
     }
 
+    // Builds the Overpass QL query around the home's coordinates.
     private String buildQuery(Double latitude, Double longitude, HomeItemCategory category) {
         String tags = getTagsByCategory(category);
 
@@ -62,6 +64,7 @@ public class OverpassService {
         };
     }
 
+    // Converts Overpass elements into sorted nearby place DTOs.
     private List<NearbyPlaceDTOOut> mapResponse(Map responseBody, Double homeLatitude, Double homeLongitude) {
         List<NearbyPlaceDTOOut> places = new ArrayList<>();
         if (responseBody == null || responseBody.get("elements") == null) {
@@ -104,6 +107,7 @@ public class OverpassService {
         return null;
     }
 
+    // Calculates distance using the Haversine formula.
     private Double calculateDistanceInMeters(Double lat1, Double lon1, Double lat2, Double lon2) {
         double earthRadius = 6371000;
         double latDistance = Math.toRadians(lat2 - lat1);

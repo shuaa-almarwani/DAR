@@ -34,6 +34,9 @@ public class User {
     private String phoneNumber;
 
     @Column(nullable = false)
+    private String role;
+
+    @Column(nullable = false)
     private LocalDate createAt;
 
     private Integer aiCounter;

@@ -15,10 +15,10 @@ public class SubscriptionPlanSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         savePlan("Standard", "Good choice for organized home management", 50.0, false, 3, 50, 20, 50, 20, true, false,
-                "https://shuaa.lemonsqueezy.com/checkout/buy/bf5e726e-a0e8-4d83-b9c1-ca11b53946e8",
+                "https://darplatform.lemonsqueezy.com/checkout/buy/5685bc49-ce2e-496f-a181-c64a845e8ddb",
                 "1780423");
         savePlan("Professional", "Best choice for villas and smart homes", 200.0, true, 10, 200, 100, 200, 100, true, true,
-                "https://shuaa.lemonsqueezy.com/checkout/buy/77311612-db16-429f-bbcc-3df50d472ad0",
+                "https://darplatform.lemonsqueezy.com/checkout/buy/9c6ea339-40cb-496b-87d9-335d745ab812",
                 "1820211");
     }
 
