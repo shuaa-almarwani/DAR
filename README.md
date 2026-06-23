@@ -12,6 +12,20 @@
 
 
 ---
+## 🧭 System Diagrams
+
+This section provides a visual overview of the DAR platform structure and main user interactions.
+
+### Use Case Diagram
+
+
+![DAR Use Case Diagram](./docs/use-case-diagram.png)
+
+### ER Diagram
+
+
+![DAR ER Diagram](./docs/er-diagram.png)
+---
 
 ## 🔐 Authentication & Security
 
