@@ -243,14 +243,6 @@ This section highlights the API endpoints
 | `POST`   | `/api/v1/notification/weather-alert/{homeId}`        | Creates a weather alert notification for a home.   | Admin         |
 | `POST`   | `/api/v1/notification/smart-alert-intro/{userId}`    | Sends the smart alert introduction notification.   | Admin         |
 
-### 👤 User Utility Endpoints
-
-| Method | Endpoint                           | Description                                            | Access        |
-| ------ | ---------------------------------- | ------------------------------------------------------ | ------------- |
-| `GET`  | `/api/v1/user/email/{email}`       | Finds a user by email.                                 | Admin         |
-| `GET`  | `/api/v1/user/username/{username}` | Finds a user by username.                              | Admin         |
-| `PUT`  | `/api/v1/user/toggle-smart-alerts` | Enables or disables smart alerts for the current user. | Authenticated |
-
 ### 💳 User Subscription Endpoints
 
 | Method   | Endpoint                                    | Description                                    | Access |
