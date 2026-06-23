@@ -166,6 +166,7 @@ private UserSubscriptionDtoOut mapToDto(UserSubscription subscription) {
 
     dto.setCheckoutUrl(
             subscription.getSubscriptionPlan().getLemonSqueezyCheckoutUrl()
+            + "?checkout[custom][userSubscriptionId]=" + subscription.getId()
     );
 
     return dto;

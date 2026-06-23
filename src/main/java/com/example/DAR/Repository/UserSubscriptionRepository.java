@@ -26,6 +26,9 @@ public interface UserSubscriptionRepository extends JpaRepository<UserSubscripti
     @Query("select s from UserSubscription s where s.status = ?1 and s.endDate < ?2")
     List<UserSubscription> findExpired(UserSubscriptionStatus status, LocalDate today);
 
+    @Query("select s from UserSubscription s where s.user.id = ?1 and s.subscriptionPlan.lemonSqueezyVariantId = ?2 and s.status = 'PENDING'")
+    UserSubscription findPendingByUserAndVariant(Integer userId, String variantId);
+
     //  to verify daily AI reminder access from the database direct
    // thiss avoids "Lazy Loading errors" from user.getUserSubscriptions()
     boolean existsUserSubscriptionByUserIdAndStatusAndPaymentStatusAndSubscriptionPlan_DailyAIReminder(

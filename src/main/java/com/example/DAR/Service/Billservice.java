@@ -96,10 +96,10 @@ public class Billservice {
     // UPDATE
     public void updateBill(Integer id, BillDtoIn dto) {
         Bill existing = billRepository.findBillById(id);
-        if (existing==null) {
-            throw new ApiException("bill not found");
-        }
+        if (existing == null) throw new ApiException("bill not found");
         modelMapper.map(dto, existing);
+        existing.setIsAnomaly(false);
+        checkAndFlagAnomaly(existing, existing.getHome());
         billRepository.save(existing);
     }
 
@@ -137,10 +137,17 @@ public class Billservice {
             Map<String, Object> data = new ObjectMapper().readValue(json, Map.class);
             Bill bill = new Bill();
             bill.setHome(home);
-            bill.setType(((String) data.get("type")).toUpperCase());
-            bill.setBillMonth(LocalDate.parse((String) data.get("billMonth")));
-            bill.setConsumption(((Number) data.get("consumption")).intValue());
-            bill.setAmount(((Number) data.get("amount")).doubleValue());
+            String type = (String) data.get("type");
+            String billMonth = (String) data.get("billMonth");
+            Number consumption = (Number) data.get("consumption");
+            Number amount = (Number) data.get("amount");
+            if (type == null || billMonth == null || consumption == null || amount == null) {
+                throw new ApiException("AI could not extract required bill fields");
+            }
+            bill.setType(type.toUpperCase());
+            bill.setBillMonth(LocalDate.parse(billMonth));
+            bill.setConsumption(consumption.intValue());
+            bill.setAmount(amount.doubleValue());
             bill.setUnit((String) data.get("unit"));
             bill.setIsInstallment((Boolean) data.getOrDefault("isInstallment", false));
             bill.setTotalInstallment(((Number) data.getOrDefault("totalInstallment", 0)).intValue());

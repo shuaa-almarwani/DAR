@@ -50,8 +50,8 @@ public class SecurityConfig {
                                 "/api/v1/user/register",
                                 "/api/v1/user/login",
                                 "/api/v1/subscription-plan/get",
-                                "/api/v1/chatbot/**"
-
+                                "/api/v1/chatbot/**",
+                                "/api/v1/payment/webhook"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
