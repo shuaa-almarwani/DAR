@@ -14,17 +14,17 @@
 ---
 ## 🧭 System Diagrams
 
-This section provides a visual overview of the DAR platform structure and main user interactions.
+### ER Diagram
+
+The ER Diagram represents the main database entities and relationships in the DAR platform, including users, homes, home items, maintenance records, reminders, bills, sensors, subscriptions, payments, and notifications.
+
+![DAR ER Diagram](./docs/er-diagram.png)
 
 ### Use Case Diagram
 
+The Use Case Diagram shows the main interactions between the owner and the DAR platform, including managing homes, devices, maintenance, reminders, bills, sensors, subscriptions, payments, chatbot, and smart reminders.
 
 ![DAR Use Case Diagram](./docs/use-case-diagram.png)
-
-### ER Diagram
-
-
-![DAR ER Diagram](./docs/er-diagram.png)
 ---
 
 ## 🔐 Authentication & Security
