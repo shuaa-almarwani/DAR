@@ -57,7 +57,7 @@
 
 
 <p align="center">
-  <img src="./docs/dar.demo.gif" alt="DAR Prototype Demo" width="100%">
+  <img src="./docs/dar-demo.gif" alt="DAR Prototype Demo" width="100%">
 </p>
 
 
