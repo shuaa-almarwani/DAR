@@ -60,6 +60,14 @@
   <img src="./docs/dar-demo.gif" alt="DAR Prototype Demo" width="100%">
 </p>
 
+## 🎬 Postman API Testing Demo 
+
+
+<p align="center">
+  <img src="./docs/PostMan (1).gif" alt="DAR Prototype Demo" width="100%">
+</p>
+
+
 
 ## ✨ Key Features
 
