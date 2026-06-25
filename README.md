@@ -53,6 +53,12 @@
 </table>
 
 ---
+## 🎬 DAR Prototype Demo
+
+
+<p align="center">
+  <img src="./docs/dar.demo.gif" alt="DAR Prototype Demo" width="100%">
+</p>
 
 
 ## ✨ Key Features
