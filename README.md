@@ -173,7 +173,7 @@ http://Dar-env.eba-yke92rm3.eu-central-1.elasticbeanstalk.com
 
 The project APIs are documented and tested using Postman.
 
-[View Postman Collection](https://documenter.getpostman.com/view/37607702/2sBXwwo8e7)
+[View Postman Collection](https://documenter.getpostman.com/view/37607702/2sBXwwoTyF)
 
 The collection includes:
 
